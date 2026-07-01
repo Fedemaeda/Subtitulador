@@ -333,6 +333,7 @@
             <div class="editor-bar">
                 <h2>Editar subtítulos</h2>
                 <button class="editor-btn ghost" id="btnNewVideo">📁 Otro video</button>
+                <button class="editor-btn ghost" id="btnBatchExport" title="Descargar .srt + video quemado">📦 Exportar todo</button>
                 <button class="editor-btn primary" id="btnBurn">Quemar en video</button>
                 <button class="editor-btn secondary" id="btnDownloadSrt">Descargar .srt</button>
             </div>
@@ -366,6 +367,31 @@
         let sessionId = null;
         let segments = [];
         let activeSegIdx = -1;
+
+        // ===== UNDO/REDO =====
+        const _undoStack = [];
+        const _redoStack = [];
+        const MAX_UNDO = 50;
+
+        function pushUndo() {
+            _undoStack.push(JSON.stringify(segments));
+            if (_undoStack.length > MAX_UNDO) _undoStack.shift();
+            _redoStack.length = 0;
+        }
+
+        function undo() {
+            if (!_undoStack.length) return;
+            _redoStack.push(JSON.stringify(segments));
+            segments = JSON.parse(_undoStack.pop());
+            renderTimeline(); saveSegments();
+        }
+
+        function redo() {
+            if (!_redoStack.length) return;
+            _undoStack.push(JSON.stringify(segments));
+            segments = JSON.parse(_redoStack.pop());
+            renderTimeline(); saveSegments();
+        }
 
         // ===== ELEMENTS =====
         const $ = id => document.getElementById(id);
@@ -521,6 +547,7 @@
                 const idx = parseInt(btn.dataset.idx);
                 if (btn.dataset.action === 'play') playSegment(idx);
                 else if (btn.dataset.action === 'delete') {
+                    pushUndo();
                     segments.splice(idx, 1);
                     if (activeSegIdx >= segments.length) activeSegIdx = segments.length - 1;
                     renderTimeline(); saveSegments();
@@ -530,15 +557,20 @@
 
             // Text editing
             timelineScroll.querySelectorAll('.seg-text').forEach(el => {
+                let prev = '';
+                el.onfocus = () => { prev = el.value; activeSegIdx = parseInt(el.dataset.idx); highlightActive(); };
                 el.oninput = () => { segments[parseInt(el.dataset.idx)].text = el.value; saveDebounced(); };
-                el.onfocus = () => { activeSegIdx = parseInt(el.dataset.idx); highlightActive(); };
+                el.onblur = () => { if (el.value !== prev) pushUndo(); };
             });
 
             // Time editing
             timelineScroll.querySelectorAll('.seg-time').forEach(el => {
+                let prev = el.value;
+                el.onfocus = () => { prev = el.value; };
                 el.onchange = () => {
                     const val = parseTime(el.value);
-                    if (val !== null) { segments[parseInt(el.dataset.idx)][el.dataset.field] = val; saveDebounced(); }
+                    if (val !== null) { pushUndo(); segments[parseInt(el.dataset.idx)][el.dataset.field] = val; saveDebounced(); }
+                    else el.value = prev;
                 };
             });
 
@@ -567,6 +599,7 @@
                     row.classList.remove('drag-over');
                     const from = dragIdx, to = parseInt(row.dataset.idx);
                     if (from === null || from === to) return;
+                    pushUndo();
                     const [moved] = segments.splice(from, 1);
                     segments.splice(to, 0, moved);
                     if (activeSegIdx === from) activeSegIdx = to;
@@ -603,6 +636,7 @@
             if (!videoPlayer.paused && t > seg.start + 0.2 && t < seg.end - 0.2) splitPoint = t;
             else splitPoint = (seg.start + seg.end) / 2;
 
+            pushUndo();
             const words = seg.text.split(/\s+/);
             const mid = Math.ceil(words.length / 2);
             segments.splice(idx, 1,
@@ -623,6 +657,7 @@
         }
 
         $('btnAddSeg').onclick = () => {
+            pushUndo();
             const lastEnd = segments.length ? segments[segments.length-1].end : 0;
             segments.push({start: lastEnd, end: lastEnd + 2, text: ''});
             renderTimeline(); saveSegments();
@@ -661,6 +696,8 @@
             progress.classList.remove('active');
             progressBar.style.width = '0%';
             errorDiv.style.display = 'none';
+            _undoStack.length = 0; _redoStack.length = 0;
+            activeSegIdx = -1;
         };
 
         // Download SRT
@@ -700,6 +737,97 @@
         function escHtml(s) {
             return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
+
+        // ===== KEYBOARD SHORTCUTS =====
+        const isInput = () => {
+            const el = document.activeElement;
+            return el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT');
+        };
+
+        document.addEventListener('keydown', e => {
+            // Ctrl+Z / Ctrl+Shift+Z — undo/redo (always active)
+            if (e.ctrlKey && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); return; }
+            if (e.ctrlKey && (e.key === 'Z' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); return; }
+            // Ctrl+Y = redo
+            if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); return; }
+
+            // Skip remaining shortcuts when typing in inputs
+            if (isInput()) return;
+
+            // Space — play/pause
+            if (e.key === ' ') {
+                e.preventDefault();
+                if (activeSegIdx >= 0) {
+                    if (videoPlayer.paused) playSegment(activeSegIdx);
+                    else videoPlayer.pause();
+                } else {
+                    videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause();
+                }
+            }
+            // Delete / Backspace — delete active segment
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (activeSegIdx >= 0) {
+                    e.preventDefault();
+                    pushUndo();
+                    segments.splice(activeSegIdx, 1);
+                    if (activeSegIdx >= segments.length) activeSegIdx = segments.length - 1;
+                    renderTimeline(); saveSegments();
+                }
+            }
+            // ArrowUp / ArrowDown — navigate segments
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (segments.length) {
+                    activeSegIdx = activeSegIdx <= 0 ? segments.length - 1 : activeSegIdx - 1;
+                    highlightActive();
+                    const row = timelineScroll.children[activeSegIdx];
+                    if (row) row.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+                }
+            }
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (segments.length) {
+                    activeSegIdx = activeSegIdx >= segments.length - 1 ? 0 : activeSegIdx + 1;
+                    highlightActive();
+                    const row = timelineScroll.children[activeSegIdx];
+                    if (row) row.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+                }
+            }
+            // Enter — split at current position
+            if (e.key === 'Enter') {
+                if (activeSegIdx >= 0) { e.preventDefault(); splitSegment(activeSegIdx); }
+            }
+            // Escape — deselect
+            if (e.key === 'Escape') {
+                activeSegIdx = -1;
+                highlightActive();
+                document.activeElement.blur();
+            }
+        });
+
+        // ===== BATCH EXPORT =====
+        $('btnBatchExport').onclick = async () => {
+            const btn = $('btnBatchExport');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Exportando...';
+            try {
+                // Download SRT
+                const srtLink = document.createElement('a');
+                srtLink.href = `/api/session/${sessionId}/srt`;
+                srtLink.download = 'subtitles.srt';
+                srtLink.click();
+                // Burn video
+                const resp = await fetch(`/api/session/${sessionId}/burn`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
+                });
+                if (!resp.ok) { const d = await resp.json(); throw new Error(d.error); }
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url;
+                a.download = `subtitled.${selectedFile ? selectedFile.name.split('.').pop() : 'mp4'}`;
+                a.click(); URL.revokeObjectURL(url);
+            } catch (err) { alert('Error: ' + err.message); }
+            btn.disabled = false; btn.innerHTML = '📦 Exportar todo';
+        };
     </script>
 </body>
 </html>
