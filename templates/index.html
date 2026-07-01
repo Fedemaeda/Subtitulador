@@ -332,6 +332,8 @@
         <div class="editor" id="editor">
             <div class="editor-bar">
                 <h2>Editar subtítulos</h2>
+                <button class="editor-btn ghost" id="btnUndo" title="Deshacer (Ctrl+Z)">↩</button>
+                <button class="editor-btn ghost" id="btnRedo" title="Rehacer (Ctrl+Shift+Z)">↪</button>
                 <button class="editor-btn ghost" id="btnNewVideo">📁 Otro video</button>
                 <button class="editor-btn ghost" id="btnBatchExport" title="Descargar .srt + video quemado">📦 Exportar todo</button>
                 <button class="editor-btn primary" id="btnBurn">Quemar en video</button>
@@ -377,20 +379,21 @@
             _undoStack.push(JSON.stringify(segments));
             if (_undoStack.length > MAX_UNDO) _undoStack.shift();
             _redoStack.length = 0;
+            updateUndoRedoButtons();
         }
 
         function undo() {
             if (!_undoStack.length) return;
             _redoStack.push(JSON.stringify(segments));
             segments = JSON.parse(_undoStack.pop());
-            renderTimeline(); saveSegments();
+            renderTimeline(); saveSegments(); updateUndoRedoButtons();
         }
 
         function redo() {
             if (!_redoStack.length) return;
             _undoStack.push(JSON.stringify(segments));
             segments = JSON.parse(_redoStack.pop());
-            renderTimeline(); saveSegments();
+            renderTimeline(); saveSegments(); updateUndoRedoButtons();
         }
 
         // ===== ELEMENTS =====
@@ -496,7 +499,8 @@
                     uploadArea.classList.add('collapsed');
                     configSection.style.display = 'none';
                     editor.classList.add('active');
-                    openEditor();
+                    _undoStack.length = 0; _redoStack.length = 0;
+                    openEditor(); updateUndoRedoButtons();
                 }, 400);
 
             } catch (err) {
@@ -663,6 +667,17 @@
             renderTimeline(); saveSegments();
             timelineScroll.scrollTop = timelineScroll.scrollHeight;
         };
+
+        $('btnUndo').onclick = undo;
+        $('btnRedo').onclick = redo;
+
+        // Disable undo/redo buttons when stack is empty
+        function updateUndoRedoButtons() {
+            $('btnUndo').disabled = !_undoStack.length;
+            $('btnRedo').disabled = !_redoStack.length;
+            $('btnUndo').style.opacity = _undoStack.length ? '1' : '0.35';
+            $('btnRedo').style.opacity = _redoStack.length ? '1' : '0.35';
+        }
 
         videoPlayer.ontimeupdate = () => {
             timeDisplay.textContent = fmtTime(videoPlayer.currentTime);
