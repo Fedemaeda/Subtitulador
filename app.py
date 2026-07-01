@@ -1,13 +1,17 @@
-"""Subtitulador - Transcribe audio from video and burn subtitles."""
+"""Subtitulador - Transcribe, edit and burn subtitles."""
 
 import os
 os.environ["FLASK_SKIP_DOTENV"] = "1"
 
+import uuid
+import json
+import time
 import tempfile
 import subprocess
 import re
 import threading
-from flask import Flask, request, jsonify, send_file, render_template
+from pathlib import Path
+from flask import Flask, request, jsonify, send_file, render_template, abort
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -20,17 +24,15 @@ import torch
 GPU_AVAILABLE = torch.cuda.is_available()
 COMPUTE_TYPE = "float16" if GPU_AVAILABLE else "int8"
 DEVICE = "cuda" if GPU_AVAILABLE else "cpu"
-
 print(f"Device: {DEVICE} | GPU: {GPU_AVAILABLE} | Compute: {COMPUTE_TYPE}")
 
-# ---- Model cache (loaded on demand) ----
+# ---- Model cache ----
 from faster_whisper import WhisperModel
 _models = {}
 _models_lock = threading.Lock()
 
 
 def get_model(name="base"):
-    """Load model on demand, cache for reuse."""
     with _models_lock:
         if name not in _models:
             print(f"Loading Whisper model '{name}' on {DEVICE}...")
@@ -41,7 +43,6 @@ def get_model(name="base"):
 
 # ---- Translation ----
 from deep_translator import GoogleTranslator
-
 _CJK_RE = re.compile(r"[\u3000-\u9fff\u3040-\u309f\u30a0-\u30ff\uff00-\uffef\u2e80-\u9fff]+")
 _LANG_MAP = {"zh": "zh-CN"}
 
@@ -112,14 +113,6 @@ def _is_in_silence(start, end, silences):
     return False
 
 
-# ---- Hallucination filter ----
-_HALLUCINATION_PATTERNS = [
-    re.compile(r"thank you|thanks|subtitles|captions", re.I),
-    re.compile(r"^\.{2,}$"),
-    re.compile(r"thank you for watching|please subscribe|thanks for watching", re.I),
-]
-
-
 def _is_hallucination(segments, min_duration=0.4, max_repeats=3):
     cleaned, seen = [], {}
     for seg in segments:
@@ -136,6 +129,13 @@ def _is_hallucination(segments, min_duration=0.4, max_repeats=3):
             continue
         cleaned.append(seg)
     return cleaned
+
+
+_HALLUCINATION_PATTERNS = [
+    re.compile(r"thank you|thanks|subtitles|captions", re.I),
+    re.compile(r"^\.{2,}$"),
+    re.compile(r"thank you for watching|please subscribe|thanks for watching", re.I),
+]
 
 
 def _tighten_timings(segments, silences):
@@ -168,6 +168,51 @@ def generate_srt(segments):
     return "\n".join(lines)
 
 
+# ---- Session storage ----
+SESSIONS_DIR = Path(tempfile.gettempdir()) / "subtitulador_sessions"
+SESSIONS_DIR.mkdir(exist_ok=True)
+_sessions = {}
+_sessions_lock = threading.Lock()
+
+
+def _create_session(video_path, ext, segments):
+    sid = str(uuid.uuid4())[:8]
+    sdir = SESSIONS_DIR / sid
+    sdir.mkdir(exist_ok=True)
+    # Copy video to session dir
+    import shutil
+    final_video = str(sdir / f"input.{ext}")
+    shutil.copy2(video_path, final_video)
+    # Save segments
+    (sdir / "segments.json").write_text(json.dumps(segments, ensure_ascii=False), encoding="utf-8")
+    with _sessions_lock:
+        _sessions[sid] = {
+            "dir": str(sdir),
+            "video": final_video,
+            "ext": ext,
+            "created": time.time(),
+        }
+    return sid
+
+
+def _get_session(sid):
+    with _sessions_lock:
+        return _sessions.get(sid)
+
+
+def _cleanup_old_sessions(max_age_hours=2):
+    cutoff = time.time() - (max_age_hours * 3600)
+    to_remove = []
+    with _sessions_lock:
+        for sid, info in _sessions.items():
+            if info["created"] < cutoff:
+                to_remove.append(sid)
+        for sid in to_remove:
+            import shutil
+            shutil.rmtree(_sessions[sid]["dir"], ignore_errors=True)
+            del _sessions[sid]
+
+
 # ---- Routes ----
 @app.route("/")
 def index():
@@ -186,6 +231,7 @@ def gpu_info():
 
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
+    """Transcribe video and return session ID + segments for editing."""
     if "video" not in request.files:
         return jsonify({"error": "No video"}), 400
 
@@ -201,90 +247,7 @@ def transcribe():
     min_duration = float(request.form.get("min_duration", 0.4))
     max_repeats = int(request.form.get("max_repeats", 3))
 
-    tmpdir = tempfile.mkdtemp()
-    try:
-        ext = file.filename.rsplit(".", 1)[1].lower()
-        video_path = os.path.join(tmpdir, f"input.{ext}")
-        file.save(video_path)
-
-        # Extract audio
-        audio_path = os.path.join(tmpdir, "audio.wav")
-        subprocess.run(
-            ["ffmpeg", "-i", video_path, "-vn", "-acodec", "pcm_s16le",
-             "-ar", "16000", "-ac", "1", audio_path, "-y"],
-            check=True, capture_output=True)
-
-        # Silence detection
-        silences = detect_silence(audio_path, noise_threshold=noise_threshold)
-
-        # Transcribe with faster-whisper
-        model = get_model(model_name)
-        raw_segments, info = model.transcribe(
-            audio_path, language=language,
-            word_timestamps=True, vad_filter=True)
-
-        segments = []
-        for seg in raw_segments:
-            segments.append({
-                "start": seg.start, "end": seg.end, "text": seg.text
-            })
-
-        detected_lang = info.language
-
-        # Filter
-        segments = _is_hallucination(segments, min_duration, max_repeats)
-        segments = _tighten_timings(segments, silences)
-
-        # Translate
-        if target_language and detected_lang != target_language:
-            for seg in segments:
-                seg["text"] = translate_text_smart(seg["text"], detected_lang, target_language)
-
-        # Save SRT for later
-        srt_content = generate_srt(segments)
-        srt_path = os.path.join(tmpdir, "subtitles.srt")
-        with open(srt_path, "w", encoding="utf-8") as f:
-            f.write(srt_content)
-
-        # Burn subtitles into video
-        output_path = os.path.join(tmpdir, f"output_subtitled.{ext}")
-        escaped_srt = srt_path.replace("\\", "/").replace(":", "\\:")
-        subprocess.run(
-            ["ffmpeg", "-i", video_path,
-             "-vf", f"subtitles='{escaped_srt}':force_style='FontSize=22,PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,Outline=2,Shadow=1,MarginV=30'",
-             "-c:a", "copy", output_path, "-y"],
-            check=True, capture_output=True)
-
-        return send_file(
-            output_path, as_attachment=True,
-            download_name=f"{os.path.splitext(secure_filename(file.filename))[0]}_subtitled.{ext}")
-
-    except subprocess.CalledProcessError as e:
-        return jsonify({"error": f"FFmpeg: {e.stderr.decode('utf-8', errors='replace')[:500]}"}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        import shutil
-        shutil.rmtree(tmpdir, ignore_errors=True)
-
-
-@app.route("/transcribe-srt", methods=["POST"])
-def transcribe_srt():
-    """Same as /transcribe but returns SRT file instead of video."""
-    if "video" not in request.files:
-        return jsonify({"error": "No video"}), 400
-
-    file = request.files["video"]
-    if file.filename == "" or not ("." in file.filename and
-            file.filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS):
-        return jsonify({"error": "Invalid file type"}), 400
-
-    model_name = request.form.get("model", "base")
-    language = request.form.get("language") or None
-    target_language = request.form.get("target_language") or None
-    noise_threshold = request.form.get("noise_threshold", "-30dB")
-    min_duration = float(request.form.get("min_duration", 0.4))
-    max_repeats = int(request.form.get("max_repeats", 3))
+    _cleanup_old_sessions()
 
     tmpdir = tempfile.mkdtemp()
     try:
@@ -315,15 +278,16 @@ def transcribe_srt():
             for seg in segments:
                 seg["text"] = translate_text_smart(seg["text"], detected_lang, target_language)
 
-        srt_content = generate_srt(segments)
-        srt_path = os.path.join(tmpdir, "subtitles.srt")
-        with open(srt_path, "w", encoding="utf-8") as f:
-            f.write(srt_content)
+        # Create session (copies video + saves segments)
+        sid = _create_session(video_path, ext, segments)
 
-        return send_file(
-            srt_path, as_attachment=True,
-            download_name=f"{os.path.splitext(secure_filename(file.filename))[0]}.srt",
-            mimetype="text/plain")
+        return jsonify({
+            "session_id": sid,
+            "segments": segments,
+            "language": detected_lang,
+            "ext": ext,
+            "filename": file.filename,
+        })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -332,7 +296,96 @@ def transcribe_srt():
         shutil.rmtree(tmpdir, ignore_errors=True)
 
 
+@app.route("/api/session/<sid>/segments", methods=["GET"])
+def get_segments(sid):
+    """Get current segments for a session."""
+    session = _get_session(sid)
+    if not session:
+        return jsonify({"error": "Session not found"}), 404
+    seg_path = Path(session["dir"]) / "segments.json"
+    if not seg_path.exists():
+        return jsonify({"error": "No segments"}), 404
+    return jsonify(json.loads(seg_path.read_text(encoding="utf-8")))
+
+
+@app.route("/api/session/<sid>/segments", methods=["PUT"])
+def save_segments(sid):
+    """Save edited segments."""
+    session = _get_session(sid)
+    if not session:
+        return jsonify({"error": "Session not found"}), 404
+    data = request.get_json()
+    if not data or "segments" not in data:
+        return jsonify({"error": "No segments provided"}), 400
+    seg_path = Path(session["dir"]) / "segments.json"
+    seg_path.write_text(json.dumps(data["segments"], ensure_ascii=False), encoding="utf-8")
+    return jsonify({"ok": True})
+
+
+@app.route("/api/session/<sid>/video")
+def get_video(sid):
+    """Get the original video for preview."""
+    session = _get_session(sid)
+    if not session:
+        abort(404)
+    return send_file(session["video"])
+
+
+@app.route("/api/session/<sid>/srt")
+def get_srt(sid):
+    """Download the current SRT file."""
+    session = _get_session(sid)
+    if not session:
+        return jsonify({"error": "Session not found"}), 404
+    seg_path = Path(session["dir"]) / "segments.json"
+    if not seg_path.exists():
+        return jsonify({"error": "No segments"}), 404
+    segments = json.loads(seg_path.read_text(encoding="utf-8"))
+    srt_content = generate_srt(segments)
+    srt_path = Path(session["dir"]) / "subtitles.srt"
+    srt_path.write_text(srt_content, encoding="utf-8")
+    return send_file(str(srt_path), as_attachment=True,
+                     download_name="subtitles.srt", mimetype="text/plain")
+
+
+@app.route("/api/session/<sid>/burn", methods=["POST"])
+def burn_subtitles(sid):
+    """Burn edited subtitles into video and return the result."""
+    session = _get_session(sid)
+    if not session:
+        return jsonify({"error": "Session not found"}), 404
+
+    font_size = request.json.get("font_size", 22) if request.is_json else 22
+    margin_v = request.json.get("margin_v", 30) if request.is_json else 30
+
+    try:
+        seg_path = Path(session["dir"]) / "segments.json"
+        segments = json.loads(seg_path.read_text(encoding="utf-8"))
+        srt_content = generate_srt(segments)
+
+        srt_path = Path(session["dir"]) / "subtitles.srt"
+        srt_path.write_text(srt_content, encoding="utf-8")
+
+        ext = session["ext"]
+        output_path = Path(session["dir"]) / f"output_subtitled.{ext}"
+        video_path = session["video"]
+
+        escaped_srt = str(srt_path).replace("\\", "/").replace(":", "\\:")
+        subprocess.run(
+            ["ffmpeg", "-i", video_path,
+             "-vf", f"subtitles='{escaped_srt}':force_style='FontSize={font_size},PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,Outline=2,Shadow=1,MarginV={margin_v}'",
+             "-c:a", "copy", str(output_path), "-y"],
+            check=True, capture_output=True)
+
+        return send_file(str(output_path), as_attachment=True,
+                         download_name=f"subtitled.{ext}")
+
+    except subprocess.CalledProcessError as e:
+        return jsonify({"error": f"FFmpeg: {e.stderr.decode('utf-8', errors='replace')[:500]}"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 if __name__ == "__main__":
-    # Preload default model
     get_model("base")
     app.run(host="127.0.0.1", port=5000, debug=False)
