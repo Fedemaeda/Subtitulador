@@ -22,11 +22,12 @@
             --error-bg: #fef2f2; --error-border: #fecaca; --error: #dc2626;
             --track: #ddd8ff; --track-active: #b8a8ff;
         }
-        html, body { height: 100%; overflow: hidden; }
+        html, body { height: 100%; }
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
             background: var(--bg); color: var(--text);
             display: flex; flex-direction: column;
+            overflow: hidden;
         }
 
         /* Header */
@@ -99,14 +100,15 @@
         /* Top row: video + edit panel */
         .editor-top {
             display: flex; flex: 1; min-height: 0; border-bottom: 1px solid var(--border);
+            overflow: hidden;
         }
 
-        /* Video preview */
+        /* Video preview - limitado */
         .preview {
             flex: 1; background: #000; display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; min-width: 0;
         }
-        .preview video { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .preview video { width: 100%; height: 100%; max-height: 100%; object-fit: contain; }
         .preview .sub-overlay {
             position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%);
             max-width: 80%; text-align: center; pointer-events: none;
@@ -118,8 +120,15 @@
 
         /* Edit panel (right side) */
         .edit-panel {
-            flex: 0 0 320px; background: var(--surface); border-left: 1px solid var(--border);
+            flex: 0 0 280px; background: var(--surface); border-left: 1px solid var(--border);
             display: flex; flex-direction: column; overflow-y: auto;
+        }
+
+        /* Responsive: en pantallas chicas, panel abajo */
+        @media (max-width: 900px) {
+            .editor-top { flex-direction: column; }
+            .preview { flex: 0 0 200px; }
+            .edit-panel { flex: 1; border-left: none; border-top: 1px solid var(--border); }
         }
         .edit-panel-header {
             padding: 0.6rem 1rem; border-bottom: 1px solid var(--border);
@@ -155,8 +164,11 @@
 
         /* Bottom: toolbar + timeline */
         .editor-bottom {
-            flex: 0 0 160px; display: flex; flex-direction: column;
+            flex: 0 0 140px; display: flex; flex-direction: column;
             background: var(--surface); border-top: 1px solid var(--border);
+        }
+        @media (max-width: 900px) {
+            .editor-bottom { flex: 0 0 120px; }
         }
         .toolbar {
             display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem;
