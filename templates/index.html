@@ -113,17 +113,17 @@
         .progress-text { font-size: 0.85rem; color: var(--text2); margin-top: 0.5rem; text-align: center; }
         .error { display: none; margin-top: 1rem; background: var(--error-bg); border: 1px solid var(--error-border); border-radius: 10px; padding: 1rem; color: var(--error); }
 
-        /* Editor layout */
-        .editor { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+        /* Editor layout - ponytail: heights fixed in px to prevent video from growing */
+        .editor { display: none; flex-direction: column; height: calc(100vh - 60px); overflow: hidden; }
         .editor.active { display: flex; }
 
-        .editor-top { padding: 1rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+        .editor-top { padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .editor-bar {
-            display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;
+            display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
         }
-        .editor-bar h2 { font-size: 1.1rem; color: var(--text); flex: 1; }
+        .editor-bar h2 { font-size: 1rem; color: var(--text); flex: 1; }
         .editor-btn {
-            padding: 0.5rem 1rem; border: none; border-radius: 8px; font-size: 0.85rem;
+            padding: 0.4rem 0.8rem; border: none; border-radius: 6px; font-size: 0.8rem;
             font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
         .editor-btn.primary { background: var(--accent); color: white; }
@@ -132,46 +132,37 @@
         .editor-btn:hover:not(:disabled) { opacity: 0.9; }
         .editor-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        /* Video section - tamaño moderado */
+        /* Video section - FIXED height, never grows */
         .video-section { 
-            flex: 0 0 auto; padding: 1rem; background: var(--surface); border-bottom: 1px solid var(--border);
-            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-            max-height: 35vh;
-        }
-        @media (max-width: 1024px) {
-            .video-section { grid-template-columns: 1fr; max-height: 45vh; }
+            flex: 0 0 240px; padding: 0.5rem 1rem; background: var(--bg); border-bottom: 1px solid var(--border);
+            display: flex; gap: 1rem; align-items: stretch;
         }
         .video-box {
-            background: #000; border-radius: 12px; overflow: hidden;
-            border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
-            aspect-ratio: 16/9;
-        }
-        .video-box video { width: 100%; height: 100%; object-fit: contain; }
-        .video-controls { 
-            display: flex; flex-direction: column; gap: 0.5rem;
-            background: var(--surface2); border-radius: 12px; padding: 0.8rem;
+            flex: 1; background: #000; border-radius: 8px; overflow: hidden;
             border: 1px solid var(--border);
         }
-        .video-controls-row { display: flex; gap: 0.3rem; }
+        .video-box video { width: 100%; height: 100%; max-height: 220px; object-fit: contain; }
+        .video-controls { 
+            flex: 0 0 120px; display: flex; flex-direction: column; gap: 0.3rem; justify-content: center;
+        }
         .video-controls button {
-            background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
-            padding: 0.5rem 0.8rem; color: var(--text); cursor: pointer; font-size: 0.8rem;
-            flex: 1;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+            padding: 0.4rem; color: var(--text); cursor: pointer; font-size: 0.85rem;
         }
         .video-controls button:hover { border-color: var(--accent); }
         .time-display {
-            font-family: 'Consolas', monospace; font-size: 0.9rem; color: var(--text2);
-            text-align: center; padding: 0.5rem;
+            font-family: 'Consolas', monospace; font-size: 0.85rem; color: var(--text2);
+            text-align: center; padding: 0.3rem;
         }
 
         /* Visual timeline */
         .timeline-visual {
-            padding: 0.8rem; background: var(--surface); border-bottom: 1px solid var(--border);
-            flex: 0 0 70px;
+            padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border);
+            flex: 0 0 60px;
         }
-        .timeline-visual-label { font-size: 0.75rem; color: var(--text3); margin-bottom: 0.3rem; }
+        .timeline-visual-label { font-size: 0.7rem; color: var(--text3); margin-bottom: 0.3rem; }
         .timeline-bar-container {
-            position: relative; height: 50px; background: var(--bg); border-radius: 6px;
+            position: relative; height: 40px; background: var(--bg); border-radius: 4px;
             border: 1px solid var(--border); overflow: hidden;
         }
         .timeline-bar {
@@ -188,8 +179,7 @@
         /* Subtitles list */
         .subtitles-section {
             flex: 1; display: flex; flex-direction: column; overflow: hidden;
-            padding: 1rem; background: var(--surface); border-top: 1px solid var(--border);
-            min-height: 300px;
+            padding: 0.5rem 1rem;
         }
         .subtitles-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
         .subtitles-header span { font-size: 0.85rem; color: var(--text2); flex: 1; }
@@ -360,11 +350,9 @@
                     <video id="videoPlayer" controls></video>
                 </div>
                 <div class="video-controls">
-                    <div class="video-controls-row">
-                        <button id="btnSeekStart" title="Inicio segmento">⏮</button>
-                        <button id="btnPlaySeg" title="Reproducir/Pausar">▶/⏸</button>
-                        <button id="btnSeekEnd" title="Fin segmento">⏭</button>
-                    </div>
+                    <button id="btnSeekStart" title="Inicio segmento">⏮</button>
+                    <button id="btnPlaySeg" title="Reproducir/Pausar">▶⏸</button>
+                    <button id="btnSeekEnd" title="Fin segmento">⏭</button>
                     <div class="time-display" id="timeDisplay">0:00.0</div>
                 </div>
             </div>
