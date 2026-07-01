@@ -144,12 +144,14 @@
         .timeline-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
         .seg-row {
-            display: grid; grid-template-columns: 28px 1fr 70px 70px auto;
+            display: grid; grid-template-columns: 28px 28px 1fr 70px 70px auto;
             gap: 0.4rem; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border);
             align-items: center; transition: background 0.15s;
         }
         .seg-row:hover { background: var(--surface2); }
         .seg-row.active { background: rgba(124,92,252,0.15); border-left: 3px solid var(--accent); }
+        .seg-row.drag-over { border-top: 2px solid var(--accent); }
+        .seg-row.dragging { opacity: 0.4; }
         .seg-num { font-size: 0.75rem; color: var(--text3); text-align: center; }
         .seg-text {
             background: transparent; border: 1px solid transparent; border-radius: 4px;
@@ -171,9 +173,13 @@
         .seg-btn:hover { color: var(--accent); background: var(--surface2); }
         .seg-btn.del:hover { color: var(--danger); }
         .seg-row .drag-handle {
-            cursor: grab; color: var(--text3); font-size: 0.8rem; text-align: center;
+            cursor: grab; color: var(--text3); font-size: 0.9rem; text-align: center;
+            user-select: none; padding: 0.2rem; border-radius: 4px;
         }
+        .seg-row .drag-handle:hover { color: var(--accent); background: var(--surface2); }
         .seg-row .drag-handle:active { cursor: grabbing; }
+        .seg-btn.split { color: #f59e0b; }
+        .seg-btn.split:hover { color: #fbbf24; background: rgba(245,158,11,0.15); }
 
         /* Video panel */
         .video-panel { position: sticky; top: 1rem; }
@@ -326,10 +332,11 @@
         </div>
         <div class="editor-layout">
             <div class="timeline-panel">
-                <div class="timeline-header">
-                    <span id="segCount">0 segmentos</span>
-                    <button class="editor-btn ghost" id="btnAddSeg" style="margin-left:auto;padding:0.3rem 0.6rem;font-size:0.8rem;">+ Añadir</button>
-                </div>
+            <div class="timeline-header">
+                <span id="segCount">0 segmentos</span>
+                <span style="font-size:0.7rem;color:var(--text3);margin-left:0.5rem;">⋮⋮ arrastrar · ✂ cortar · ▶ reproducir</span>
+                <button class="editor-btn ghost" id="btnAddSeg" style="margin-left:auto;padding:0.3rem 0.6rem;font-size:0.8rem;">+ Añadir</button>
+            </div>
                 <div class="timeline-scroll" id="timelineScroll"></div>
             </div>
             <div class="video-panel">
@@ -485,21 +492,24 @@
                 const row = document.createElement('div');
                 row.className = 'seg-row' + (i === activeSegIdx ? ' active' : '');
                 row.dataset.idx = i;
+                row.draggable = true;
 
                 row.innerHTML = `
+                    <div class="drag-handle" title="Arrastrar para reordenar">⋮⋮</div>
                     <div class="seg-num">${i + 1}</div>
                     <textarea class="seg-text" rows="2" data-idx="${i}">${escHtml(seg.text)}</textarea>
                     <input class="seg-time" type="text" value="${fmtTime(seg.start)}" data-idx="${i}" data-field="start">
                     <input class="seg-time" type="text" value="${fmtTime(seg.end)}" data-idx="${i}" data-field="end">
                     <div class="seg-actions">
                         <button class="seg-btn" data-action="play" data-idx="${i}" title="Reproducir">▶</button>
+                        <button class="seg-btn split" data-action="split" data-idx="${i}" title="Cortar en dos">✂</button>
                         <button class="seg-btn del" data-action="delete" data-idx="${i}" title="Eliminar">✕</button>
                     </div>
                 `;
                 timelineScroll.appendChild(row);
             });
 
-            // Event delegation
+            // Event delegation for buttons
             timelineScroll.onclick = e => {
                 const btn = e.target.closest('[data-action]');
                 if (!btn) return;
@@ -511,6 +521,8 @@
                     if (activeSegIdx >= segments.length) activeSegIdx = segments.length - 1;
                     renderTimeline();
                     saveSegments();
+                } else if (btn.dataset.action === 'split') {
+                    splitSegment(idx);
                 }
             };
 
@@ -535,6 +547,52 @@
                     }
                 };
             });
+
+            // ===== DRAG & DROP REORDER =====
+            let dragIdx = null;
+
+            timelineScroll.querySelectorAll('.seg-row').forEach(row => {
+                row.ondragstart = e => {
+                    dragIdx = parseInt(row.dataset.idx);
+                    row.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    // Required for Firefox
+                    e.dataTransfer.setData('text/plain', dragIdx);
+                };
+
+                row.ondragend = () => {
+                    row.classList.remove('dragging');
+                    dragIdx = null;
+                    timelineScroll.querySelectorAll('.seg-row').forEach(r => r.classList.remove('drag-over'));
+                };
+
+                row.ondragover = e => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    // Highlight drop target
+                    timelineScroll.querySelectorAll('.seg-row').forEach(r => r.classList.remove('drag-over'));
+                    row.classList.add('drag-over');
+                };
+
+                row.ondrop = e => {
+                    e.preventDefault();
+                    row.classList.remove('drag-over');
+                    const fromIdx = dragIdx;
+                    const toIdx = parseInt(row.dataset.idx);
+                    if (fromIdx === null || fromIdx === toIdx) return;
+
+                    // Move segment
+                    const [moved] = segments.splice(fromIdx, 1);
+                    segments.splice(toIdx, 0, moved);
+
+                    if (activeSegIdx === fromIdx) activeSegIdx = toIdx;
+                    else if (fromIdx < activeSegIdx && toIdx >= activeSegIdx) activeSegIdx--;
+                    else if (fromIdx > activeSegIdx && toIdx <= activeSegIdx) activeSegIdx++;
+
+                    renderTimeline();
+                    saveSegments();
+                };
+            });
         }
 
         function highlightActive() {
@@ -557,6 +615,38 @@
                 }
             };
             videoPlayer.addEventListener('timeupdate', checker);
+        }
+
+        function splitSegment(idx) {
+            const seg = segments[idx];
+            // Split at video position if playing and within segment, else midpoint
+            let splitPoint;
+            const t = videoPlayer.currentTime;
+            if (!videoPlayer.paused && t > seg.start + 0.2 && t < seg.end - 0.2) {
+                splitPoint = t;
+            } else {
+                splitPoint = (seg.start + seg.end) / 2;
+            }
+
+            // Split text roughly in half by words
+            const words = seg.text.split(/\s+/);
+            const mid = Math.ceil(words.length / 2);
+            const text1 = words.slice(0, mid).join(' ');
+            const text2 = words.slice(mid).join(' ');
+
+            const seg1 = { start: seg.start, end: splitPoint, text: text1 };
+            const seg2 = { start: splitPoint, end: seg.end, text: text2 };
+
+            // Replace original with two segments
+            segments.splice(idx, 1, seg1, seg2);
+
+            // If we were playing, keep playing the second half
+            if (!videoPlayer.paused) {
+                videoPlayer.currentTime = splitPoint;
+            }
+
+            renderTimeline();
+            saveSegments();
         }
 
         // Save debounced
