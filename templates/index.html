@@ -20,66 +20,58 @@
             --success: #16a34a; --danger: #dc2626;
             --error-bg: #fef2f2; --error-border: #fecaca; --error: #dc2626;
         }
+        html, body { height: 100%; }
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--bg); color: var(--text);
-            min-height: 100vh; padding: 1rem;
+            display: flex; flex-direction: column;
+            padding: 0;
         }
 
         /* Header */
-        .header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .header { 
+            display: flex; align-items: center; gap: 1rem; padding: 1rem;
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
         h1 {
-            font-size: 1.6rem; font-weight: 600; flex: 1;
+            font-size: 1.5rem; font-weight: 600; flex: 1;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         .theme-toggle {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+            background: transparent; border: 1px solid var(--border); border-radius: 8px;
             padding: 0.3rem 0.6rem; cursor: pointer; font-size: 1rem; color: var(--text);
         }
         .gpu-badge {
-            font-size: 0.75rem; color: var(--text2); background: var(--surface);
+            font-size: 0.75rem; color: var(--text2); background: var(--surface2);
             border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.6rem;
         }
-        .gpu-badge .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 0.3rem; }
-        .gpu-badge .dot.on { background: var(--success); }
-        .gpu-badge .dot.off { background: #f59e0b; }
 
-        /* Main container */
-        .main { max-width: 1200px; margin: 0 auto; }
+        /* Main content */
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* Upload area */
-        .upload-area {
-            max-width: 700px; margin: 0 auto 1.5rem;
-            transition: all 0.3s;
-        }
-        .upload-area.collapsed {
-            max-width: 100%; margin-bottom: 1rem;
-        }
+        /* Upload section */
+        .upload-area { padding: 1.5rem; max-width: 700px; margin: 0 auto; }
+        .upload-area.hidden { display: none; }
         .dropzone {
             border: 2px dashed var(--border); border-radius: 16px; padding: 2.5rem 2rem;
             text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface);
         }
-        .upload-area.collapsed .dropzone { padding: 0.8rem 1.5rem; border-radius: 10px; }
-        .upload-area.collapsed .dropzone .icon { display: none; }
-        .upload-area.collapsed .dropzone .label { font-size: 0.9rem; margin-bottom: 0; }
-        .upload-area.collapsed .dropzone .hint { display: none; }
         .dropzone:hover, .dropzone.dragover { border-color: var(--accent); }
         .dropzone.has-file { border-color: var(--accent2); border-style: solid; }
         .dropzone input[type="file"] { display: none; }
-        .dropzone .icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+        .dropzone .icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
         .dropzone .label { font-size: 1.05rem; color: var(--text); margin-bottom: 0.4rem; }
         .dropzone .hint { font-size: 0.8rem; color: var(--text3); }
-        .filename { color: var(--accent2); font-weight: 500; margin-top: 0.5rem; word-break: break-all; }
-        .upload-area.collapsed .filename { margin-top: 0; font-size: 0.85rem; }
-
+        .filename { color: var(--accent2); font-weight: 500; margin-top: 0.5rem; }
         .config-toggle {
-            margin-top: 0.8rem; background: none; border: 1px solid var(--border);
+            margin-top: 1rem; background: none; border: 1px solid var(--border);
             border-radius: 8px; padding: 0.5rem 1rem; color: var(--text2);
             cursor: pointer; font-size: 0.85rem; width: 100%;
         }
         .config-panel {
-            display: none; margin-top: 0.8rem; background: var(--surface);
+            display: none; margin-top: 1rem; background: var(--surface);
             border: 1px solid var(--border); border-radius: 12px; padding: 1rem;
         }
         .config-panel.open { display: block; }
@@ -99,8 +91,7 @@
             background: var(--accent); cursor: pointer;
         }
         .range-val { font-size: 0.7rem; color: var(--text3); text-align: right; }
-
-        .options { margin-top: 0.8rem; display: flex; gap: 1rem; align-items: center; }
+        .options { margin-top: 1rem; display: flex; gap: 1rem; align-items: center; }
         .options label { font-size: 0.85rem; color: var(--text2); white-space: nowrap; }
         .options select {
             flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border);
@@ -108,30 +99,27 @@
         }
         .options-row { display: flex; gap: 1rem; }
         .options-row .options { flex: 1; }
-
-        .btn-row { display: flex; gap: 0.8rem; margin-top: 1.2rem; }
         .btn {
-            flex: 1; padding: 0.85rem; border: none; border-radius: 12px;
+            padding: 0.85rem; border: none; border-radius: 12px;
             font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
         .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent3)); color: white; }
         .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,92,252,0.4); }
-        .btn-secondary { background: linear-gradient(135deg, var(--accent2), #0077aa); color: white; }
-        .btn-secondary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,212,255,0.4); }
-        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        /* Progress */
-        .progress-container { margin-top: 1.2rem; display: none; }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+        .progress-container { margin-top: 1rem; display: none; }
         .progress-container.active { display: block; }
-        .progress-bar-bg { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; height: 8px; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 8px; width: 0%; transition: width 0.3s; }
+        .progress-bar-bg { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; height: 8px; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; transition: width 0.3s; }
         .progress-text { font-size: 0.85rem; color: var(--text2); margin-top: 0.5rem; text-align: center; }
+        .error { display: none; margin-top: 1rem; background: var(--error-bg); border: 1px solid var(--error-border); border-radius: 10px; padding: 1rem; color: var(--error); }
 
-        /* Editor */
-        .editor { display: none; }
-        .editor.active { display: block; }
+        /* Editor layout */
+        .editor { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+        .editor.active { display: flex; }
+
+        .editor-top { padding: 1rem; background: var(--surface); border-bottom: 1px solid var(--border); }
         .editor-bar {
-            display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem; flex-wrap: wrap;
+            display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap;
         }
         .editor-bar h2 { font-size: 1.1rem; color: var(--text); flex: 1; }
         .editor-btn {
@@ -141,82 +129,94 @@
         .editor-btn.primary { background: var(--accent); color: white; }
         .editor-btn.secondary { background: var(--accent2); color: white; }
         .editor-btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
-        .editor-btn:hover { opacity: 0.9; }
+        .editor-btn:hover:not(:disabled) { opacity: 0.9; }
+        .editor-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        .editor-layout { display: grid; grid-template-columns: 1fr 380px; gap: 1rem; }
-        @media (max-width: 900px) { .editor-layout { grid-template-columns: 1fr; } }
-
-        .timeline-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-        .timeline-header {
-            padding: 0.7rem 1rem; border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--text2);
+        /* Video section - full width */
+        .video-section { 
+            flex: 0 0 50%; padding: 1rem; background: #000; border-bottom: 1px solid var(--border);
+            display: flex; flex-direction: column; gap: 0.5rem;
         }
-        .timeline-scroll {
-            max-height: 55vh; overflow-y: auto; scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
-        }
-        .timeline-scroll::-webkit-scrollbar { width: 6px; }
-        .timeline-scroll::-webkit-scrollbar-track { background: transparent; }
-        .timeline-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-        .seg-row {
-            display: grid; grid-template-columns: 24px 24px 1fr 65px 65px auto;
-            gap: 0.3rem; padding: 0.5rem 0.8rem; border-bottom: 1px solid var(--border);
-            align-items: center; transition: background 0.15s;
-        }
-        .seg-row:hover { background: var(--surface2); }
-        .seg-row.active { background: rgba(124,92,252,0.15); border-left: 3px solid var(--accent); }
-        .seg-row.drag-over { border-top: 2px solid var(--accent); }
-        .seg-row.dragging { opacity: 0.4; }
-        .seg-num { font-size: 0.7rem; color: var(--text3); text-align: center; }
-        .seg-text {
-            background: transparent; border: 1px solid transparent; border-radius: 4px;
-            color: var(--text); font-size: 0.85rem; padding: 0.25rem 0.3rem; resize: none;
-            font-family: inherit; line-height: 1.3; width: 100%;
-        }
-        .seg-text:focus { outline: none; border-color: var(--accent); background: var(--bg); }
-        .seg-time {
-            background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
-            color: var(--text2); font-size: 0.7rem; padding: 0.25rem; text-align: center;
-            font-family: 'Consolas', monospace; width: 100%;
-        }
-        .seg-time:focus { outline: none; border-color: var(--accent); color: var(--text); }
-        .seg-actions { display: flex; gap: 0.15rem; }
-        .seg-btn {
-            background: none; border: none; cursor: pointer; font-size: 0.8rem;
-            padding: 0.15rem; border-radius: 4px; color: var(--text3); transition: all 0.15s;
-        }
-        .seg-btn:hover { color: var(--accent); background: var(--surface2); }
-        .seg-btn.del:hover { color: var(--danger); }
-        .seg-btn.split { color: #f59e0b; }
-        .seg-btn.split:hover { color: #fbbf24; background: rgba(245,158,11,0.15); }
-        .seg-row .drag-handle {
-            cursor: grab; color: var(--text3); font-size: 0.85rem; text-align: center;
-            user-select: none; padding: 0.15rem; border-radius: 4px;
-        }
-        .seg-row .drag-handle:hover { color: var(--accent); background: var(--surface2); }
-        .seg-row .drag-handle:active { cursor: grabbing; }
-
-        .video-panel { position: sticky; top: 1rem; }
         .video-box {
-            background: #000; border-radius: 12px; overflow: hidden;
-            border: 1px solid var(--border);
+            flex: 1; background: #000; border-radius: 12px; overflow: hidden;
+            border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
         }
-        .video-box video { width: 100%; display: block; }
-        .video-controls { padding: 0.5rem 0.8rem; display: flex; gap: 0.5rem; align-items: center; }
+        .video-box video { width: 100%; height: 100%; object-fit: contain; }
+        .video-controls { display: flex; gap: 0.5rem; align-items: center; }
         .video-controls button {
             background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
             padding: 0.3rem 0.6rem; color: var(--text); cursor: pointer; font-size: 0.8rem;
         }
         .video-controls button:hover { border-color: var(--accent); }
-        .video-controls .time-display {
+        .time-display {
             font-family: 'Consolas', monospace; font-size: 0.8rem; color: var(--text2);
+            margin-left: auto;
         }
 
-        .error {
-            display: none; margin-top: 1rem; background: var(--error-bg); border: 1px solid var(--error-border);
-            border-radius: 10px; padding: 1rem; color: var(--error); font-size: 0.9rem;
+        /* Visual timeline */
+        .timeline-visual {
+            padding: 1rem; background: var(--surface); border-bottom: 1px solid var(--border);
+            flex: 0 0 100px;
         }
+        .timeline-visual-label { font-size: 0.8rem; color: var(--text2); margin-bottom: 0.5rem; }
+        .timeline-bar-container {
+            position: relative; height: 60px; background: var(--bg); border-radius: 8px;
+            border: 1px solid var(--border); overflow: hidden;
+        }
+        .timeline-bar {
+            position: absolute; height: 100%; background: var(--accent); opacity: 0.7;
+            border-right: 2px solid var(--accent2); cursor: grab; transition: opacity 0.2s;
+        }
+        .timeline-bar:hover { opacity: 0.9; }
+        .timeline-bar.active { opacity: 1; box-shadow: 0 0 8px var(--accent); }
+        .timeline-playhead {
+            position: absolute; top: 0; width: 2px; height: 100%; background: var(--accent2);
+            z-index: 10; pointer-events: none;
+        }
+
+        /* Subtitles list */
+        .subtitles-section {
+            flex: 1; display: flex; flex-direction: column; overflow: hidden;
+            padding: 1rem; background: var(--surface); border-top: 1px solid var(--border);
+        }
+        .subtitles-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .subtitles-header span { font-size: 0.85rem; color: var(--text2); flex: 1; }
+        .subtitles-header button {
+            background: var(--accent); color: white; border: none; border-radius: 6px;
+            padding: 0.3rem 0.6rem; font-size: 0.75rem; cursor: pointer;
+        }
+        .subtitles-list { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+        .subtitles-list::-webkit-scrollbar { width: 6px; }
+        .subtitles-list::-webkit-scrollbar-track { background: transparent; }
+        .subtitles-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .sub-item {
+            display: grid; grid-template-columns: 40px 60px 60px 1fr auto auto auto; gap: 0.4rem;
+            padding: 0.5rem; margin-bottom: 0.3rem; background: var(--surface2); border-radius: 6px;
+            border: 1px solid var(--border); align-items: center;
+        }
+        .sub-item:hover { background: rgba(124,92,252,0.1); }
+        .sub-item.active { border-left: 3px solid var(--accent); background: rgba(124,92,252,0.15); }
+        .sub-num { font-size: 0.7rem; color: var(--text3); text-align: center; }
+        .sub-time-input {
+            background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+            color: var(--text2); font-size: 0.7rem; padding: 0.2rem; text-align: center;
+            font-family: 'Consolas', monospace; width: 100%;
+        }
+        .sub-time-input:focus { outline: none; border-color: var(--accent); color: var(--text); }
+        .sub-text {
+            background: transparent; border: 1px solid transparent; border-radius: 4px;
+            color: var(--text); font-size: 0.9rem; padding: 0.3rem; resize: none;
+            font-family: inherit; width: 100%;
+        }
+        .sub-text:focus { outline: none; border-color: var(--accent); background: var(--bg); }
+        .sub-actions { display: flex; gap: 0.2rem; }
+        .sub-btn {
+            background: none; border: none; cursor: pointer; font-size: 0.9rem;
+            color: var(--text3); padding: 0.2rem; border-radius: 4px; transition: all 0.15s;
+        }
+        .sub-btn:hover { color: var(--accent); background: var(--bg); }
+        .sub-btn.del:hover { color: var(--danger); }
 
         @keyframes spin { to { transform: rotate(360deg); } }
         .spinner {
@@ -228,9 +228,10 @@
     </style>
 </head>
 <body>
+    <!-- HEADER -->
     <div class="header">
         <h1>Subtitulador</h1>
-        <span class="gpu-badge" id="gpuBadge"><span class="dot off"></span> ...</span>
+        <span class="gpu-badge" id="gpuBadge">CPU</span>
         <button class="theme-toggle" id="themeToggle">🌙</button>
     </div>
 
@@ -239,7 +240,7 @@
         <div class="upload-area" id="uploadArea">
             <div class="dropzone" id="dropzone">
                 <input type="file" id="fileInput" accept="video/*">
-                <span class="icon">🎬</span>
+                <div class="icon">🎬</div>
                 <div class="label">Arrastra un video aquí o haz clic</div>
                 <div class="hint">MP4, MKV, AVI, MOV, WebM — hasta 2 GB</div>
                 <div class="filename" id="filename"></div>
@@ -317,48 +318,58 @@
                 </div>
             </div>
 
-            <button class="btn btn-primary" id="btnTranscribe" disabled>Transcribir y editar subtítulos</button>
-        </div>
+            <button class="btn btn-primary" id="btnTranscribe" style="margin-top: 1rem; width: 100%;" disabled>Transcribir y editar subtítulos</button>
 
-        <!-- PROGRESS -->
-        <div class="progress-container" id="progress">
-            <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
-            <div class="progress-text" id="progressText">Preparando...</div>
-        </div>
+            <div class="progress-container" id="progress">
+                <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+                <div class="progress-text" id="progressText">Preparando...</div>
+            </div>
 
-        <div class="error" id="error"><strong>Error</strong> <span id="errorText"></span></div>
+            <div class="error" id="error"><strong>Error</strong> <span id="errorText"></span></div>
+        </div>
 
         <!-- EDITOR -->
         <div class="editor" id="editor">
-            <div class="editor-bar">
-                <h2>Editar subtítulos</h2>
-                <button class="editor-btn ghost" id="btnUndo" title="Deshacer (Ctrl+Z)">&#x21A9; Deshacer</button>
-                <button class="editor-btn ghost" id="btnRedo" title="Rehacer (Ctrl+Shift+Z)">&#x21AA; Rehacer</button>
-                <button class="editor-btn ghost" id="btnNewVideo">📁 Otro video</button>
-                <button class="editor-btn ghost" id="btnBatchExport" title="Descargar .srt + video quemado">📦 Exportar todo</button>
-                <button class="editor-btn primary" id="btnBurn">Quemar en video</button>
-                <button class="editor-btn secondary" id="btnDownloadSrt">Descargar .srt</button>
+            <div class="editor-top">
+                <div class="editor-bar">
+                    <h2>Editar subtítulos</h2>
+                    <button class="editor-btn ghost" id="btnUndo" title="Deshacer (Ctrl+Z)">&#x21A9; Deshacer</button>
+                    <button class="editor-btn ghost" id="btnRedo" title="Rehacer (Ctrl+Shift+Z)">&#x21AA; Rehacer</button>
+                    <button class="editor-btn ghost" id="btnNewVideo">📁 Otro video</button>
+                    <button class="editor-btn ghost" id="btnBatchExport" title="Descargar .srt + video quemado">📦 Exportar todo</button>
+                    <button class="editor-btn primary" id="btnBurn">Quemar en video</button>
+                    <button class="editor-btn secondary" id="btnDownloadSrt">Descargar .srt</button>
+                </div>
             </div>
-            <div class="editor-layout">
-                <div class="timeline-panel">
-                    <div class="timeline-header">
-                        <span id="segCount">0 segmentos</span>
-                        <span style="font-size:0.7rem;color:var(--text3);margin-left:0.5rem;">⋮⋮ arrastrar · ✂ cortar · ▶ reproducir</span>
-                        <button class="editor-btn ghost" id="btnAddSeg" style="margin-left:auto;padding:0.2rem 0.5rem;font-size:0.75rem;">+ Añadir</button>
-                    </div>
-                    <div class="timeline-scroll" id="timelineScroll"></div>
+
+            <!-- Video -->
+            <div class="video-section">
+                <div class="video-box">
+                    <video id="videoPlayer" controls></video>
                 </div>
-                <div class="video-panel">
-                    <div class="video-box">
-                        <video id="videoPlayer" controls></video>
-                    </div>
-                    <div class="video-controls">
-                        <button id="btnSeekStart" title="Inicio segmento">⏮</button>
-                        <button id="btnPlaySeg" title="Reproducir segmento">▶</button>
-                        <button id="btnSeekEnd" title="Fin segmento">⏭</button>
-                        <span class="time-display" id="timeDisplay">0:00.0</span>
-                    </div>
+                <div class="video-controls">
+                    <button id="btnSeekStart" title="Inicio segmento">⏮</button>
+                    <button id="btnPlaySeg" title="Reproducir segmento">▶</button>
+                    <button id="btnSeekEnd" title="Fin segmento">⏭</button>
+                    <span class="time-display" id="timeDisplay">0:00.0</span>
                 </div>
+            </div>
+
+            <!-- Timeline visual -->
+            <div class="timeline-visual">
+                <div class="timeline-visual-label" id="timelineLabel">Timeline</div>
+                <div class="timeline-bar-container" id="timelineBarContainer">
+                    <div class="timeline-playhead" id="timelinePlayhead"></div>
+                </div>
+            </div>
+
+            <!-- Subtitles list -->
+            <div class="subtitles-section">
+                <div class="subtitles-header">
+                    <span id="subCount">0 subtítulos</span>
+                    <button id="btnAddSub" title="Añadir nuevo">+ Añadir</button>
+                </div>
+                <div class="subtitles-list" id="subtitlesList"></div>
             </div>
         </div>
     </div>
@@ -369,6 +380,7 @@
         let sessionId = null;
         let segments = [];
         let activeSegIdx = -1;
+        let videoDuration = 0;
 
         // ===== UNDO/REDO =====
         const _undoStack = [];
@@ -386,14 +398,19 @@
             if (!_undoStack.length) return;
             _redoStack.push(JSON.stringify(segments));
             segments = JSON.parse(_undoStack.pop());
-            renderTimeline(); saveSegments(); updateUndoRedoButtons();
+            renderSubtitles(); saveSegments(); updateUndoRedoButtons();
         }
 
         function redo() {
             if (!_redoStack.length) return;
             _undoStack.push(JSON.stringify(segments));
             segments = JSON.parse(_redoStack.pop());
-            renderTimeline(); saveSegments(); updateUndoRedoButtons();
+            renderSubtitles(); saveSegments(); updateUndoRedoButtons();
+        }
+
+        function updateUndoRedoButtons() {
+            $('btnUndo').disabled = !_undoStack.length;
+            $('btnRedo').disabled = !_redoStack.length;
         }
 
         // ===== ELEMENTS =====
@@ -411,9 +428,11 @@
         const errorText = $('errorText');
         const editor = $('editor');
         const videoPlayer = $('videoPlayer');
-        const timelineScroll = $('timelineScroll');
-        const segCount = $('segCount');
+        const subtitlesList = $('subtitlesList');
+        const subCount = $('subCount');
         const timeDisplay = $('timeDisplay');
+        const timelineBarContainer = $('timelineBarContainer');
+        const timelinePlayhead = $('timelinePlayhead');
 
         // ===== THEME =====
         const saved = localStorage.getItem('theme') || 'dark';
@@ -428,9 +447,7 @@
 
         // ===== GPU =====
         fetch('/gpu').then(r=>r.json()).then(d=>{
-            $('gpuBadge').innerHTML = d.gpu
-                ? `<span class="dot on"></span> ${d.device.toUpperCase()}`
-                : `<span class="dot off"></span> CPU`;
+            $('gpuBadge').innerHTML = d.gpu ? `<span style="color: var(--success);">●</span> GPU` : `<span style="color: #f59e0b;">●</span> CPU`;
         });
 
         // ===== CONFIG =====
@@ -496,11 +513,11 @@
 
                 setTimeout(() => {
                     progress.classList.remove('active');
-                    uploadArea.classList.add('collapsed');
-                    configSection.style.display = 'none';
+                    uploadArea.hidden = true;
                     editor.classList.add('active');
                     _undoStack.length = 0; _redoStack.length = 0;
-                    openEditor(); updateUndoRedoButtons();
+                    openEditor(); 
+                    updateUndoRedoButtons();
                 }, 400);
 
             } catch (err) {
@@ -516,36 +533,34 @@
         // ===== EDITOR =====
         function openEditor() {
             videoPlayer.src = `/api/session/${sessionId}/video`;
-            renderTimeline();
+            renderSubtitles();
         }
 
-        function renderTimeline() {
-            timelineScroll.innerHTML = '';
-            segCount.textContent = `${segments.length} segmentos`;
+        function renderSubtitles() {
+            subtitlesList.innerHTML = '';
+            subCount.textContent = `${segments.length} subtítulos`;
+            renderTimeline();
 
             segments.forEach((seg, i) => {
-                const row = document.createElement('div');
-                row.className = 'seg-row' + (i === activeSegIdx ? ' active' : '');
-                row.dataset.idx = i;
-                row.draggable = true;
+                const item = document.createElement('div');
+                item.className = 'sub-item' + (i === activeSegIdx ? ' active' : '');
+                item.dataset.idx = i;
 
-                row.innerHTML = `
-                    <div class="drag-handle" title="Arrastrar">⋮⋮</div>
-                    <div class="seg-num">${i + 1}</div>
-                    <textarea class="seg-text" rows="2" data-idx="${i}">${escHtml(seg.text)}</textarea>
-                    <input class="seg-time" type="text" value="${fmtTime(seg.start)}" data-idx="${i}" data-field="start">
-                    <input class="seg-time" type="text" value="${fmtTime(seg.end)}" data-idx="${i}" data-field="end">
-                    <div class="seg-actions">
-                        <button class="seg-btn" data-action="play" data-idx="${i}" title="Reproducir">▶</button>
-                        <button class="seg-btn split" data-action="split" data-idx="${i}" title="Cortar">✂</button>
-                        <button class="seg-btn del" data-action="delete" data-idx="${i}" title="Eliminar">✕</button>
+                item.innerHTML = `
+                    <div class="sub-num">${i + 1}</div>
+                    <input class="sub-time-input" type="text" value="${fmtTime(seg.start)}" data-idx="${i}" data-field="start" title="Inicio">
+                    <input class="sub-time-input" type="text" value="${fmtTime(seg.end)}" data-idx="${i}" data-field="end" title="Fin">
+                    <textarea class="sub-text" rows="2" data-idx="${i}" title="Texto del subtítulo">${escHtml(seg.text)}</textarea>
+                    <div class="sub-actions">
+                        <button class="sub-btn" data-action="play" data-idx="${i}" title="Reproducir">▶</button>
+                        <button class="sub-btn del" data-action="delete" data-idx="${i}" title="Eliminar">✕</button>
                     </div>
                 `;
-                timelineScroll.appendChild(row);
+                subtitlesList.appendChild(item);
             });
 
-            // Button clicks
-            timelineScroll.onclick = e => {
+            // Event listeners
+            subtitlesList.onclick = e => {
                 const btn = e.target.closest('[data-action]');
                 if (!btn) return;
                 const idx = parseInt(btn.dataset.idx);
@@ -554,13 +569,12 @@
                     pushUndo();
                     segments.splice(idx, 1);
                     if (activeSegIdx >= segments.length) activeSegIdx = segments.length - 1;
-                    renderTimeline(); saveSegments();
+                    renderSubtitles(); saveSegments();
                 }
-                else if (btn.dataset.action === 'split') splitSegment(idx);
             };
 
             // Text editing
-            timelineScroll.querySelectorAll('.seg-text').forEach(el => {
+            subtitlesList.querySelectorAll('.sub-text').forEach(el => {
                 let prev = '';
                 el.onfocus = () => { prev = el.value; activeSegIdx = parseInt(el.dataset.idx); highlightActive(); };
                 el.oninput = () => { segments[parseInt(el.dataset.idx)].text = el.value; saveDebounced(); };
@@ -568,7 +582,7 @@
             });
 
             // Time editing
-            timelineScroll.querySelectorAll('.seg-time').forEach(el => {
+            subtitlesList.querySelectorAll('.sub-time-input').forEach(el => {
                 let prev = el.value;
                 el.onfocus = () => { prev = el.value; };
                 el.onchange = () => {
@@ -578,44 +592,34 @@
                 };
             });
 
-            // Drag & drop
-            let dragIdx = null;
-            timelineScroll.querySelectorAll('.seg-row').forEach(row => {
-                row.ondragstart = e => {
-                    dragIdx = parseInt(row.dataset.idx);
-                    row.classList.add('dragging');
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/plain', dragIdx);
-                };
-                row.ondragend = () => {
-                    row.classList.remove('dragging');
-                    dragIdx = null;
-                    timelineScroll.querySelectorAll('.seg-row').forEach(r => r.classList.remove('drag-over'));
-                };
-                row.ondragover = e => {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = 'move';
-                    timelineScroll.querySelectorAll('.seg-row').forEach(r => r.classList.remove('drag-over'));
-                    row.classList.add('drag-over');
-                };
-                row.ondrop = e => {
-                    e.preventDefault();
-                    row.classList.remove('drag-over');
-                    const from = dragIdx, to = parseInt(row.dataset.idx);
-                    if (from === null || from === to) return;
-                    pushUndo();
-                    const [moved] = segments.splice(from, 1);
-                    segments.splice(to, 0, moved);
-                    if (activeSegIdx === from) activeSegIdx = to;
-                    else if (from < activeSegIdx && to >= activeSegIdx) activeSegIdx--;
-                    else if (from > activeSegIdx && to <= activeSegIdx) activeSegIdx++;
-                    renderTimeline(); saveSegments();
-                };
+            highlightActive();
+        }
+
+        function renderTimeline() {
+            if (!videoDuration) return;
+            const bars = subtitlesList.parentElement.querySelectorAll('.timeline-bar');
+            bars.forEach(b => b.remove());
+
+            segments.forEach((seg, i) => {
+                const bar = document.createElement('div');
+                bar.className = 'timeline-bar' + (i === activeSegIdx ? ' active' : '');
+                bar.dataset.idx = i;
+                
+                const dur = videoDuration;
+                const left = (seg.start / dur) * 100;
+                const width = ((seg.end - seg.start) / dur) * 100;
+                
+                bar.style.left = left + '%';
+                bar.style.width = Math.max(width, 2) + '%';
+                
+                bar.onclick = () => { activeSegIdx = i; highlightActive(); playSegment(i); };
+                timelineBarContainer.appendChild(bar);
             });
         }
 
         function highlightActive() {
-            timelineScroll.querySelectorAll('.seg-row').forEach((r, i) => r.classList.toggle('active', i === activeSegIdx));
+            subtitlesList.querySelectorAll('.sub-item').forEach((r, i) => r.classList.toggle('active', i === activeSegIdx));
+            timelineBarContainer.querySelectorAll('.timeline-bar').forEach((b, i) => b.classList.toggle('active', i === activeSegIdx));
         }
 
         function playSegment(idx) {
@@ -633,24 +637,6 @@
             videoPlayer.addEventListener('timeupdate', checker);
         }
 
-        function splitSegment(idx) {
-            const seg = segments[idx];
-            let splitPoint;
-            const t = videoPlayer.currentTime;
-            if (!videoPlayer.paused && t > seg.start + 0.2 && t < seg.end - 0.2) splitPoint = t;
-            else splitPoint = (seg.start + seg.end) / 2;
-
-            pushUndo();
-            const words = seg.text.split(/\s+/);
-            const mid = Math.ceil(words.length / 2);
-            segments.splice(idx, 1,
-                { start: seg.start, end: splitPoint, text: words.slice(0, mid).join(' ') },
-                { start: splitPoint, end: seg.end, text: words.slice(mid).join(' ') }
-            );
-            if (!videoPlayer.paused) videoPlayer.currentTime = splitPoint;
-            renderTimeline(); saveSegments();
-        }
-
         let saveTimeout;
         function saveDebounced() { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveSegments, 500); }
         function saveSegments() {
@@ -660,27 +646,23 @@
             });
         }
 
-        $('btnAddSeg').onclick = () => {
+        $('btnAddSub').onclick = () => {
             pushUndo();
             const lastEnd = segments.length ? segments[segments.length-1].end : 0;
             segments.push({start: lastEnd, end: lastEnd + 2, text: ''});
-            renderTimeline(); saveSegments();
-            timelineScroll.scrollTop = timelineScroll.scrollHeight;
+            renderSubtitles(); saveSegments();
+            subtitlesList.scrollTop = subtitlesList.scrollHeight;
         };
 
-        $('btnUndo').onclick = undo;
-        $('btnRedo').onclick = redo;
-
-        // Disable undo/redo buttons when stack is empty
-        function updateUndoRedoButtons() {
-            $('btnUndo').disabled = !_undoStack.length;
-            $('btnRedo').disabled = !_redoStack.length;
-            $('btnUndo').style.opacity = _undoStack.length ? '1' : '0.35';
-            $('btnRedo').style.opacity = _redoStack.length ? '1' : '0.35';
-        }
+        videoPlayer.onloadedmetadata = () => {
+            videoDuration = videoPlayer.duration;
+            renderTimeline();
+        };
 
         videoPlayer.ontimeupdate = () => {
             timeDisplay.textContent = fmtTime(videoPlayer.currentTime);
+            timelinePlayhead.style.left = (videoPlayer.currentTime / videoDuration * 100) + '%';
+            
             const t = videoPlayer.currentTime;
             let found = -1;
             for (let i = 0; i < segments.length; i++) {
@@ -689,8 +671,8 @@
             if (found !== -1 && found !== activeSegIdx) {
                 activeSegIdx = found;
                 highlightActive();
-                const row = timelineScroll.children[found];
-                if (row) row.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+                const item = subtitlesList.children[found];
+                if (item) item.scrollIntoView({block: 'nearest', behavior: 'smooth'});
             }
         };
 
@@ -701,8 +683,7 @@
         // New video
         $('btnNewVideo').onclick = () => {
             editor.classList.remove('active');
-            uploadArea.classList.remove('collapsed');
-            configSection.style.display = '';
+            uploadArea.hidden = false;
             videoPlayer.pause(); videoPlayer.src = '';
             selectedFile = null; fileInput.value = ''; filename.textContent = '';
             dropzone.classList.remove('has-file');
@@ -736,6 +717,84 @@
             btn.disabled = false; btn.innerHTML = 'Quemar en video';
         };
 
+        // Batch export
+        $('btnBatchExport').onclick = async () => {
+            const btn = $('btnBatchExport');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Exportando...';
+            try {
+                const srtLink = document.createElement('a');
+                srtLink.href = `/api/session/${sessionId}/srt`;
+                srtLink.download = 'subtitles.srt';
+                srtLink.click();
+                const resp = await fetch(`/api/session/${sessionId}/burn`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
+                });
+                if (!resp.ok) { const d = await resp.json(); throw new Error(d.error); }
+                const blob = await resp.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url;
+                a.download = `subtitled.${selectedFile ? selectedFile.name.split('.').pop() : 'mp4'}`;
+                a.click(); URL.revokeObjectURL(url);
+            } catch (err) { alert('Error: ' + err.message); }
+            btn.disabled = false; btn.innerHTML = '📦 Exportar todo';
+        };
+
+        // ===== KEYBOARD SHORTCUTS =====
+        const isInput = () => {
+            const el = document.activeElement;
+            return el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT');
+        };
+
+        document.addEventListener('keydown', e => {
+            if (e.ctrlKey && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); return; }
+            if (e.ctrlKey && (e.key === 'Z' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); return; }
+            if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); return; }
+
+            if (isInput()) return;
+
+            if (e.key === ' ') {
+                e.preventDefault();
+                if (activeSegIdx >= 0) {
+                    if (videoPlayer.paused) playSegment(activeSegIdx);
+                    else videoPlayer.pause();
+                } else {
+                    videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause();
+                }
+            }
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (activeSegIdx >= 0) {
+                    e.preventDefault();
+                    pushUndo();
+                    segments.splice(activeSegIdx, 1);
+                    if (activeSegIdx >= segments.length) activeSegIdx = segments.length - 1;
+                    renderSubtitles(); saveSegments();
+                }
+            }
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (segments.length) {
+                    activeSegIdx = activeSegIdx <= 0 ? segments.length - 1 : activeSegIdx - 1;
+                    highlightActive();
+                    const item = subtitlesList.children[activeSegIdx];
+                    if (item) item.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+                }
+            }
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (segments.length) {
+                    activeSegIdx = activeSegIdx >= segments.length - 1 ? 0 : activeSegIdx + 1;
+                    highlightActive();
+                    const item = subtitlesList.children[activeSegIdx];
+                    if (item) item.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+                }
+            }
+            if (e.key === 'Escape') {
+                activeSegIdx = -1;
+                highlightActive();
+                document.activeElement.blur();
+            }
+        });
+
         // ===== UTILS =====
         function fmtTime(sec) {
             if (sec == null || isNaN(sec)) return '0:00.0';
@@ -752,97 +811,6 @@
         function escHtml(s) {
             return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
-
-        // ===== KEYBOARD SHORTCUTS =====
-        const isInput = () => {
-            const el = document.activeElement;
-            return el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT');
-        };
-
-        document.addEventListener('keydown', e => {
-            // Ctrl+Z / Ctrl+Shift+Z — undo/redo (always active)
-            if (e.ctrlKey && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); return; }
-            if (e.ctrlKey && (e.key === 'Z' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); return; }
-            // Ctrl+Y = redo
-            if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); return; }
-
-            // Skip remaining shortcuts when typing in inputs
-            if (isInput()) return;
-
-            // Space — play/pause
-            if (e.key === ' ') {
-                e.preventDefault();
-                if (activeSegIdx >= 0) {
-                    if (videoPlayer.paused) playSegment(activeSegIdx);
-                    else videoPlayer.pause();
-                } else {
-                    videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause();
-                }
-            }
-            // Delete / Backspace — delete active segment
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                if (activeSegIdx >= 0) {
-                    e.preventDefault();
-                    pushUndo();
-                    segments.splice(activeSegIdx, 1);
-                    if (activeSegIdx >= segments.length) activeSegIdx = segments.length - 1;
-                    renderTimeline(); saveSegments();
-                }
-            }
-            // ArrowUp / ArrowDown — navigate segments
-            if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (segments.length) {
-                    activeSegIdx = activeSegIdx <= 0 ? segments.length - 1 : activeSegIdx - 1;
-                    highlightActive();
-                    const row = timelineScroll.children[activeSegIdx];
-                    if (row) row.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-                }
-            }
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (segments.length) {
-                    activeSegIdx = activeSegIdx >= segments.length - 1 ? 0 : activeSegIdx + 1;
-                    highlightActive();
-                    const row = timelineScroll.children[activeSegIdx];
-                    if (row) row.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-                }
-            }
-            // Enter — split at current position
-            if (e.key === 'Enter') {
-                if (activeSegIdx >= 0) { e.preventDefault(); splitSegment(activeSegIdx); }
-            }
-            // Escape — deselect
-            if (e.key === 'Escape') {
-                activeSegIdx = -1;
-                highlightActive();
-                document.activeElement.blur();
-            }
-        });
-
-        // ===== BATCH EXPORT =====
-        $('btnBatchExport').onclick = async () => {
-            const btn = $('btnBatchExport');
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Exportando...';
-            try {
-                // Download SRT
-                const srtLink = document.createElement('a');
-                srtLink.href = `/api/session/${sessionId}/srt`;
-                srtLink.download = 'subtitles.srt';
-                srtLink.click();
-                // Burn video
-                const resp = await fetch(`/api/session/${sessionId}/burn`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
-                });
-                if (!resp.ok) { const d = await resp.json(); throw new Error(d.error); }
-                const blob = await resp.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url;
-                a.download = `subtitled.${selectedFile ? selectedFile.name.split('.').pop() : 'mp4'}`;
-                a.click(); URL.revokeObjectURL(url);
-            } catch (err) { alert('Error: ' + err.message); }
-            btn.disabled = false; btn.innerHTML = '📦 Exportar todo';
-        };
     </script>
 </body>
 </html>
