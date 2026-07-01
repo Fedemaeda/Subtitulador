@@ -7,62 +7,58 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #222; --border: #333;
-            --text: #e0e0e0; --text2: #888; --text3: #666;
+            --bg: #0d0d0d; --surface: #1a1a1a; --surface2: #252525; --border: #333;
+            --text: #e0e0e0; --text2: #999; --text3: #666;
             --accent: #7c5cfc; --accent2: #00d4ff; --accent3: #5a3fd4;
             --success: #4ade80; --danger: #ef4444;
             --error-bg: #2a1515; --error-border: #5c2020; --error: #f87171;
+            --track: #2a2a5a; --track-active: #4a3aaa;
         }
         [data-theme="light"] {
-            --bg: #f5f5f5; --surface: #fff; --surface2: #f0f0f0; --border: #ddd;
+            --bg: #f0f0f0; --surface: #fff; --surface2: #f5f5f5; --border: #ddd;
             --text: #1a1a1a; --text2: #666; --text3: #999;
             --accent: #6b4ce6; --accent2: #0099cc; --accent3: #5a3fd4;
             --success: #16a34a; --danger: #dc2626;
             --error-bg: #fef2f2; --error-border: #fecaca; --error: #dc2626;
+            --track: #ddd8ff; --track-active: #b8a8ff;
         }
-        html, body { height: 100%; }
+        html, body { height: 100%; overflow: hidden; }
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             background: var(--bg); color: var(--text);
             display: flex; flex-direction: column;
-            padding: 0;
         }
 
         /* Header */
-        .header { 
-            display: flex; align-items: center; gap: 1rem; padding: 1rem;
+        .header {
+            display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem 1rem;
             background: var(--surface); border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
+            flex: 0 0 44px;
         }
-        h1 {
-            font-size: 1.5rem; font-weight: 600; flex: 1;
+        .header h1 {
+            font-size: 1.2rem; font-weight: 700; flex: 1;
             background: linear-gradient(135deg, var(--accent), var(--accent2));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .theme-toggle {
-            background: transparent; border: 1px solid var(--border); border-radius: 8px;
-            padding: 0.3rem 0.6rem; cursor: pointer; font-size: 1rem; color: var(--text);
+        .hdr-btn {
+            background: transparent; border: 1px solid var(--border); border-radius: 6px;
+            padding: 0.25rem 0.5rem; cursor: pointer; font-size: 0.8rem; color: var(--text2);
         }
-        .gpu-badge {
-            font-size: 0.75rem; color: var(--text2); background: var(--surface2);
-            border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.6rem;
-        }
+        .hdr-btn:hover { border-color: var(--accent); color: var(--text); }
 
-        /* Main content */
-        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
-
-        /* Upload section */
-        .upload-area { padding: 1.5rem; max-width: 700px; margin: 0 auto; }
-        .upload-area.hidden { display: none; }
+        /* Upload */
+        .upload-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .upload-area[hidden] { display: none; }
+        .upload-box { max-width: 600px; width: 100%; }
         .dropzone {
-            border: 2px dashed var(--border); border-radius: 16px; padding: 2.5rem 2rem;
-            text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface);
+            border: 2px dashed var(--border); border-radius: 16px; padding: 3rem 2rem;
+            text-align: center; cursor: pointer; background: var(--surface); transition: all 0.2s;
         }
         .dropzone:hover, .dropzone.dragover { border-color: var(--accent); }
         .dropzone.has-file { border-color: var(--accent2); border-style: solid; }
-        .dropzone input[type="file"] { display: none; }
-        .dropzone .icon { font-size: 2.5rem; margin-bottom: 0.8rem; }
-        .dropzone .label { font-size: 1.05rem; color: var(--text); margin-bottom: 0.4rem; }
+        .dropzone input { display: none; }
+        .dropzone .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .dropzone .label { font-size: 1.1rem; margin-bottom: 0.3rem; }
         .dropzone .hint { font-size: 0.8rem; color: var(--text3); }
         .filename { color: var(--accent2); font-weight: 500; margin-top: 0.5rem; }
         .config-toggle {
@@ -70,387 +66,257 @@
             border-radius: 8px; padding: 0.5rem 1rem; color: var(--text2);
             cursor: pointer; font-size: 0.85rem; width: 100%;
         }
-        .config-panel {
-            display: none; margin-top: 1rem; background: var(--surface);
-            border: 1px solid var(--border); border-radius: 12px; padding: 1rem;
-        }
+        .config-panel { display: none; margin-top: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
         .config-panel.open { display: block; }
         .config-row { display: flex; gap: 1rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
-        .config-item { flex: 1; min-width: 130px; }
+        .config-item { flex: 1; min-width: 120px; }
         .config-item label { display: block; font-size: 0.8rem; color: var(--text2); margin-bottom: 0.3rem; }
-        .config-item select {
-            width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border);
-            border-radius: 6px; padding: 0.4rem; font-size: 0.85rem;
-        }
-        .config-item input[type="range"] {
-            width: 100%; -webkit-appearance: none; height: 6px; background: var(--border);
-            border-radius: 3px; outline: none; margin-top: 0.4rem;
-        }
-        .config-item input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
-            background: var(--accent); cursor: pointer;
-        }
+        .config-item select { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem; font-size: 0.85rem; }
+        .config-item input[type="range"] { width: 100%; margin-top: 0.3rem; }
         .range-val { font-size: 0.7rem; color: var(--text3); text-align: right; }
-        .options { margin-top: 1rem; display: flex; gap: 1rem; align-items: center; }
-        .options label { font-size: 0.85rem; color: var(--text2); white-space: nowrap; }
-        .options select {
-            flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border);
-            border-radius: 8px; padding: 0.5rem 1rem; font-size: 0.9rem;
+        .options-row { display: flex; gap: 1rem; margin-top: 1rem; }
+        .options { flex: 1; display: flex; gap: 0.5rem; align-items: center; }
+        .options label { font-size: 0.8rem; color: var(--text2); white-space: nowrap; }
+        .options select { flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem; font-size: 0.85rem; }
+        .btn-go {
+            margin-top: 1.2rem; width: 100%; padding: 0.9rem; border: none; border-radius: 12px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            background: linear-gradient(135deg, var(--accent), var(--accent3)); color: white;
         }
-        .options-row { display: flex; gap: 1rem; }
-        .options-row .options { flex: 1; }
-        .btn {
-            padding: 0.85rem; border: none; border-radius: 12px;
-            font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-        }
-        .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent3)); color: white; }
-        .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,92,252,0.4); }
-        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-go:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-go:hover:not(:disabled) { box-shadow: 0 4px 20px rgba(124,92,252,0.4); }
         .progress-container { margin-top: 1rem; display: none; }
         .progress-container.active { display: block; }
-        .progress-bar-bg { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; height: 8px; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; transition: width 0.3s; }
-        .progress-text { font-size: 0.85rem; color: var(--text2); margin-top: 0.5rem; text-align: center; }
-        .error { display: none; margin-top: 1rem; background: var(--error-bg); border: 1px solid var(--error-border); border-radius: 10px; padding: 1rem; color: var(--error); }
+        .progress-bar-bg { background: var(--surface2); border-radius: 8px; height: 6px; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 8px; width: 0%; transition: width 0.3s; }
+        .progress-text { font-size: 0.8rem; color: var(--text2); margin-top: 0.4rem; text-align: center; }
+        .error { display: none; margin-top: 1rem; background: var(--error-bg); border: 1px solid var(--error-border); border-radius: 8px; padding: 0.8rem; color: var(--error); font-size: 0.85rem; }
 
-        /* Editor layout - ponytail: heights fixed in px to prevent video from growing */
-        .editor { display: none; flex-direction: column; height: calc(100vh - 60px); overflow: hidden; }
+        /* ===== EDITOR ===== */
+        .editor { display: none; flex: 1; flex-direction: column; overflow: hidden; }
         .editor.active { display: flex; }
 
-        .editor-top { padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
-        .editor-bar {
+        /* Top row: video + edit panel */
+        .editor-top {
+            display: flex; flex: 1; min-height: 0; border-bottom: 1px solid var(--border);
+        }
+
+        /* Video preview */
+        .preview {
+            flex: 1; background: #000; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .preview video { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .preview .sub-overlay {
+            position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%);
+            max-width: 80%; text-align: center; pointer-events: none;
+        }
+        .preview .sub-overlay span {
+            background: rgba(0,0,0,0.75); color: #fff; padding: 4px 12px; border-radius: 4px;
+            font-size: 1.1rem; line-height: 1.5; display: inline-block;
+        }
+
+        /* Edit panel (right side) */
+        .edit-panel {
+            flex: 0 0 320px; background: var(--surface); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .edit-panel-header {
+            padding: 0.6rem 1rem; border-bottom: 1px solid var(--border);
             display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
         }
-        .editor-bar h2 { font-size: 1rem; color: var(--text); flex: 1; }
-        .editor-btn {
-            padding: 0.4rem 0.8rem; border: none; border-radius: 6px; font-size: 0.8rem;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
+        .edit-panel-header .title { font-size: 0.85rem; color: var(--text2); flex: 1; }
+        .ep-btn {
+            background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+            padding: 0.3rem 0.6rem; font-size: 0.75rem; color: var(--text2); cursor: pointer;
         }
-        .editor-btn.primary { background: var(--accent); color: white; }
-        .editor-btn.secondary { background: var(--accent2); color: white; }
-        .editor-btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--text2); }
-        .editor-btn:hover:not(:disabled) { opacity: 0.9; }
-        .editor-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .ep-btn:hover { border-color: var(--accent); color: var(--text); }
+        .ep-btn.accent { background: var(--accent); border-color: var(--accent); color: white; }
+        .ep-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
 
-        /* Video section - FIXED height, never grows */
-        .video-section { 
-            flex: 0 0 240px; padding: 0.5rem 1rem; background: var(--bg); border-bottom: 1px solid var(--border);
-            display: flex; gap: 1rem; align-items: stretch;
+        .edit-segment {
+            padding: 1rem; flex: 1; display: flex; flex-direction: column; gap: 0.8rem;
         }
-        .video-box {
-            flex: 1; background: #000; border-radius: 8px; overflow: hidden;
-            border: 1px solid var(--border);
+        .edit-segment .empty { color: var(--text3); font-size: 0.9rem; text-align: center; padding: 2rem; }
+        .edit-label { font-size: 0.75rem; color: var(--text3); margin-bottom: 0.2rem; }
+        .edit-textarea {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+            color: var(--text); font-size: 1rem; padding: 0.7rem; resize: none; font-family: inherit;
+            min-height: 80px;
         }
-        .video-box video { width: 100%; height: 100%; max-height: 220px; object-fit: contain; }
-        .video-controls { 
-            flex: 0 0 120px; display: flex; flex-direction: column; gap: 0.3rem; justify-content: center;
+        .edit-textarea:focus { outline: none; border-color: var(--accent); }
+        .edit-time-row { display: flex; gap: 0.5rem; }
+        .edit-time-input {
+            flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+            color: var(--text); font-size: 0.9rem; padding: 0.5rem; text-align: center;
+            font-family: 'Consolas', monospace;
         }
-        .video-controls button {
-            background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
-            padding: 0.4rem; color: var(--text); cursor: pointer; font-size: 0.85rem;
+        .edit-time-input:focus { outline: none; border-color: var(--accent); }
+
+        /* Bottom: toolbar + timeline */
+        .editor-bottom {
+            flex: 0 0 160px; display: flex; flex-direction: column;
+            background: var(--surface); border-top: 1px solid var(--border);
         }
-        .video-controls button:hover { border-color: var(--accent); }
-        .time-display {
+        .toolbar {
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem;
+            border-bottom: 1px solid var(--border); flex: 0 0 36px;
+        }
+        .toolbar .time-display {
             font-family: 'Consolas', monospace; font-size: 0.85rem; color: var(--text2);
-            text-align: center; padding: 0.3rem;
         }
+        .tb-btn {
+            background: var(--surface2); border: 1px solid var(--border); border-radius: 4px;
+            padding: 0.2rem 0.5rem; color: var(--text2); cursor: pointer; font-size: 0.8rem;
+        }
+        .tb-btn:hover { border-color: var(--accent); color: var(--text); }
+        .tb-sep { width: 1px; height: 20px; background: var(--border); }
 
-        /* Visual timeline */
-        .timeline-visual {
-            padding: 0.5rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border);
-            flex: 0 0 60px;
+        /* Timeline */
+        .timeline {
+            flex: 1; position: relative; overflow-x: auto; overflow-y: hidden;
+            background: var(--bg); cursor: default;
         }
-        .timeline-visual-label { font-size: 0.7rem; color: var(--text3); margin-bottom: 0.3rem; }
-        .timeline-bar-container {
-            position: relative; height: 40px; background: var(--bg); border-radius: 4px;
-            border: 1px solid var(--border); overflow: hidden;
+        .timeline-ruler {
+            height: 20px; position: relative; border-bottom: 1px solid var(--border);
+            background: var(--surface2);
         }
-        .timeline-bar {
-            position: absolute; height: 100%; background: var(--accent); opacity: 0.7;
-            border-right: 2px solid var(--accent2); cursor: grab; transition: opacity 0.2s;
+        .timeline-ruler .tick {
+            position: absolute; top: 0; height: 100%;
+            border-left: 1px solid var(--border); font-size: 9px; color: var(--text3);
+            padding-left: 3px; line-height: 20px;
         }
-        .timeline-bar:hover { opacity: 0.9; }
-        .timeline-bar.active { opacity: 1; box-shadow: 0 0 8px var(--accent); }
+        .timeline-track {
+            position: relative; height: 60px; margin: 4px 0;
+        }
+        .timeline-block {
+            position: absolute; top: 4px; bottom: 4px;
+            background: var(--track); border: 1px solid var(--accent); border-radius: 4px;
+            cursor: pointer; display: flex; align-items: center; padding: 0 6px;
+            font-size: 0.7rem; color: var(--text); overflow: hidden; white-space: nowrap;
+            transition: background 0.1s;
+            min-width: 20px;
+        }
+        .timeline-block:hover { background: var(--track-active); }
+        .timeline-block.active { background: var(--track-active); border-color: var(--accent2); box-shadow: 0 0 6px var(--accent); }
+        .timeline-block .resize-l, .timeline-block .resize-r {
+            position: absolute; top: 0; width: 6px; height: 100%; cursor: ew-resize;
+        }
+        .timeline-block .resize-l { left: 0; }
+        .timeline-block .resize-r { right: 0; }
         .timeline-playhead {
-            position: absolute; top: 0; width: 2px; height: 100%; background: var(--accent2);
-            z-index: 10; pointer-events: none;
+            position: absolute; top: 0; bottom: 0; width: 2px; background: var(--danger);
+            z-index: 20; pointer-events: none;
         }
-
-        /* Subtitles list */
-        .subtitles-section {
-            flex: 1; display: flex; flex-direction: column; overflow: hidden;
-            padding: 0.5rem 1rem;
-        }
-        .subtitles-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-        .subtitles-header span { font-size: 0.85rem; color: var(--text2); flex: 1; }
-        .subtitles-header button {
-            background: var(--accent); color: white; border: none; border-radius: 6px;
-            padding: 0.3rem 0.6rem; font-size: 0.75rem; cursor: pointer;
-        }
-        .subtitles-list { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
-        .subtitles-list::-webkit-scrollbar { width: 6px; }
-        .subtitles-list::-webkit-scrollbar-track { background: transparent; }
-        .subtitles-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-        .sub-item {
-            display: grid; grid-template-columns: 40px 60px 60px 1fr auto auto auto; gap: 0.4rem;
-            padding: 0.5rem; margin-bottom: 0.3rem; background: var(--surface2); border-radius: 6px;
-            border: 1px solid var(--border); align-items: center;
-        }
-        .sub-item:hover { background: rgba(124,92,252,0.1); }
-        .sub-item.active { border-left: 3px solid var(--accent); background: rgba(124,92,252,0.15); }
-        .sub-num { font-size: 0.7rem; color: var(--text3); text-align: center; }
-        .sub-time-input {
-            background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
-            color: var(--text2); font-size: 0.7rem; padding: 0.2rem; text-align: center;
-            font-family: 'Consolas', monospace; width: 100%;
-        }
-        .sub-time-input:focus { outline: none; border-color: var(--accent); color: var(--text); }
-        .sub-text {
-            background: transparent; border: 1px solid transparent; border-radius: 4px;
-            color: var(--text); font-size: 0.9rem; padding: 0.3rem; resize: none;
-            font-family: inherit; width: 100%;
-        }
-        .sub-text:focus { outline: none; border-color: var(--accent); background: var(--bg); }
-        .sub-actions { display: flex; gap: 0.2rem; }
-        .sub-btn {
-            background: none; border: none; cursor: pointer; font-size: 0.9rem;
-            color: var(--text3); padding: 0.2rem; border-radius: 4px; transition: all 0.15s;
-        }
-        .sub-btn:hover { color: var(--accent); background: var(--bg); }
-        .sub-btn.del:hover { color: var(--danger); }
 
         @keyframes spin { to { transform: rotate(360deg); } }
-        .spinner {
-            display: inline-block; width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
-            border-radius: 50%; animation: spin 0.6s linear infinite;
-            vertical-align: middle; margin-right: 0.4rem;
-        }
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 0.3rem; }
     </style>
 </head>
 <body>
-    <!-- HEADER -->
     <div class="header">
         <h1>Subtitulador</h1>
-        <span class="gpu-badge" id="gpuBadge">CPU</span>
-        <button class="theme-toggle" id="themeToggle">🌙</button>
+        <span id="gpuBadge" class="hdr-btn" style="cursor:default;">CPU</span>
+        <button class="hdr-btn" id="themeToggle">&#x1F319;</button>
     </div>
 
-    <div class="main">
-        <!-- UPLOAD -->
-        <div class="upload-area" id="uploadArea">
+    <!-- UPLOAD -->
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-box">
             <div class="dropzone" id="dropzone">
                 <input type="file" id="fileInput" accept="video/*">
-                <div class="icon">🎬</div>
-                <div class="label">Arrastra un video aquí o haz clic</div>
-                <div class="hint">MP4, MKV, AVI, MOV, WebM — hasta 2 GB</div>
+                <div class="icon">&#x1F3AC;</div>
+                <div class="label">Arrastra un video o haz clic</div>
+                <div class="hint">MP4, MKV, AVI, MOV, WebM &mdash; hasta 2 GB</div>
                 <div class="filename" id="filename"></div>
             </div>
-
-            <div id="configSection">
-                <button class="config-toggle" id="configToggle">⚙ Configuración avanzada</button>
-                <div class="config-panel" id="configPanel">
-                    <div class="config-row">
-                        <div class="config-item">
-                            <label>Modelo Whisper</label>
-                            <select id="modelSelect">
-                                <option value="tiny">tiny (~75 MB)</option>
-                                <option value="base" selected>base (~140 MB)</option>
-                                <option value="small">small (~460 MB)</option>
-                                <option value="medium">medium (~1.5 GB)</option>
-                                <option value="large-v3">large-v3 (~3 GB)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="config-row">
-                        <div class="config-item">
-                            <label>Silencio</label>
-                            <input type="range" id="noiseThreshold" min="-50" max="-10" value="-30" step="5">
-                            <div class="range-val" id="noiseVal">-30 dB</div>
-                        </div>
-                        <div class="config-item">
-                            <label>Duración mín.</label>
-                            <input type="range" id="minDuration" min="0.2" max="2.0" value="0.4" step="0.1">
-                            <div class="range-val" id="minDurVal">0.4 s</div>
-                        </div>
-                        <div class="config-item">
-                            <label>Max repet.</label>
-                            <input type="range" id="maxRepeats" min="1" max="10" value="3" step="1">
-                            <div class="range-val" id="maxRepVal">3</div>
-                        </div>
-                    </div>
+            <button class="config-toggle" id="configToggle">&#x2699; Configuraci&oacute;n avanzada</button>
+            <div class="config-panel" id="configPanel">
+                <div class="config-row">
+                    <div class="config-item"><label>Modelo</label><select id="modelSelect"><option value="tiny">tiny</option><option value="base" selected>base</option><option value="small">small</option><option value="medium">medium</option><option value="large-v3">large-v3</option></select></div>
+                    <div class="config-item"><label>Silencio</label><input type="range" id="noiseThreshold" min="-50" max="-10" value="-30" step="5"><div class="range-val" id="noiseVal">-30 dB</div></div>
+                    <div class="config-item"><label>Dur. m&iacute;n.</label><input type="range" id="minDuration" min="0.2" max="2.0" value="0.4" step="0.1"><div class="range-val" id="minDurVal">0.4 s</div></div>
+                    <div class="config-item"><label>Max repet.</label><input type="range" id="maxRepeats" min="1" max="10" value="3" step="1"><div class="range-val" id="maxRepVal">3</div></div>
                 </div>
             </div>
-
             <div class="options-row">
-                <div class="options">
-                    <label>Audio:</label>
-                    <select id="language">
-                        <option value="">Auto-detectar</option>
-                        <option value="es">Español</option>
-                        <option value="en">English</option>
-                        <option value="pt">Português</option>
-                        <option value="fr">Français</option>
-                        <option value="de">Deutsch</option>
-                        <option value="it">Italiano</option>
-                        <option value="ja">日本語</option>
-                        <option value="ko">한국어</option>
-                        <option value="zh">中文</option>
-                        <option value="ru">Русский</option>
-                        <option value="ar">العربية</option>
-                    </select>
+                <div class="options"><label>Audio:</label><select id="language"><option value="">Auto</option><option value="es">ES</option><option value="en">EN</option><option value="ja">JA</option><option value="pt">PT</option><option value="fr">FR</option><option value="de">DE</option><option value="it">IT</option><option value="ko">KO</option><option value="zh">ZH</option><option value="ru">RU</option><option value="ar">AR</option></select></div>
+                <div class="options"><label>Subs:</label><select id="targetLanguage"><option value="">Sin trad.</option><option value="es" selected>ES</option><option value="en">EN</option><option value="ja">JA</option><option value="pt">PT</option><option value="fr">FR</option><option value="de">DE</option><option value="it">IT</option><option value="ko">KO</option><option value="zh">ZH</option><option value="ru">RU</option><option value="ar">AR</option></select></div>
+            </div>
+            <button class="btn-go" id="btnTranscribe" disabled>Transcribir</button>
+            <div class="progress-container" id="progress"><div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div><div class="progress-text" id="progressText">Preparando...</div></div>
+            <div class="error" id="error"><span id="errorText"></span></div>
+        </div>
+    </div>
+
+    <!-- EDITOR -->
+    <div class="editor" id="editor">
+        <div class="editor-top">
+            <!-- Video preview with subtitle overlay -->
+            <div class="preview">
+                <video id="videoPlayer" controls></video>
+                <div class="sub-overlay" id="subOverlay"><span id="subOverlayText"></span></div>
+            </div>
+            <!-- Edit panel -->
+            <div class="edit-panel">
+                <div class="edit-panel-header">
+                    <span class="title">Editar</span>
+                    <button class="ep-btn" id="btnUndo" title="Ctrl+Z">&#x21A9;</button>
+                    <button class="ep-btn" id="btnRedo" title="Ctrl+Shift+Z">&#x21AA;</button>
+                    <button class="ep-btn" id="btnNewVideo">Otro</button>
+                    <button class="ep-btn" id="btnDownloadSrt">SRT</button>
+                    <button class="ep-btn accent" id="btnBurn">Quemar</button>
                 </div>
-                <div class="options">
-                    <label>Subtítulos a:</label>
-                    <select id="targetLanguage">
-                        <option value="">Sin traducción</option>
-                        <option value="es" selected>Español</option>
-                        <option value="en">English</option>
-                        <option value="pt">Português</option>
-                        <option value="fr">Français</option>
-                        <option value="de">Deutsch</option>
-                        <option value="it">Italiano</option>
-                        <option value="ja">日本語</option>
-                        <option value="ko">한국어</option>
-                        <option value="zh">中文</option>
-                        <option value="ru">Русский</option>
-                        <option value="ar">العربية</option>
-                    </select>
+                <div class="edit-segment" id="editSegment">
+                    <div class="empty">Selecciona un subt&iacute;tulo en la l&iacute;nea de tiempo</div>
                 </div>
             </div>
-
-            <button class="btn btn-primary" id="btnTranscribe" style="margin-top: 1rem; width: 100%;" disabled>Transcribir y editar subtítulos</button>
-
-            <div class="progress-container" id="progress">
-                <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
-                <div class="progress-text" id="progressText">Preparando...</div>
-            </div>
-
-            <div class="error" id="error"><strong>Error</strong> <span id="errorText"></span></div>
         </div>
 
-        <!-- EDITOR -->
-        <div class="editor" id="editor">
-            <div class="editor-top">
-                <div class="editor-bar">
-                    <h2>Editar subtítulos</h2>
-                    <button class="editor-btn ghost" id="btnUndo" title="Deshacer (Ctrl+Z)">&#x21A9; Deshacer</button>
-                    <button class="editor-btn ghost" id="btnRedo" title="Rehacer (Ctrl+Shift+Z)">&#x21AA; Rehacer</button>
-                    <button class="editor-btn ghost" id="btnNewVideo">📁 Otro video</button>
-                    <button class="editor-btn ghost" id="btnBatchExport" title="Descargar .srt + video quemado">📦 Exportar todo</button>
-                    <button class="editor-btn primary" id="btnBurn">Quemar en video</button>
-                    <button class="editor-btn secondary" id="btnDownloadSrt">Descargar .srt</button>
-                </div>
+        <!-- Bottom: toolbar + timeline -->
+        <div class="editor-bottom">
+            <div class="toolbar">
+                <button class="tb-btn" id="btnPlay">&#x25B6;</button>
+                <span class="time-display" id="timeDisplay">0:00.0</span>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="btnSplit" title="Cortar (S)">&#x2702;</button>
+                <button class="tb-btn" id="btnDelete" title="Eliminar (Del)">&#x2716;</button>
+                <button class="tb-btn" id="btnAdd" title="A&ntilde;adir">+</button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="btnZoomIn">+&#x1F50D;</button>
+                <button class="tb-btn" id="btnZoomOut">-&#x1F50D;</button>
+                <span style="flex:1"></span>
+                <button class="tb-btn" id="btnExportAll">&#x1F4E6; Exportar</button>
             </div>
-
-            <!-- Video -->
-            <div class="video-section">
-                <div class="video-box">
-                    <video id="videoPlayer" controls></video>
-                </div>
-                <div class="video-controls">
-                    <button id="btnSeekStart" title="Inicio segmento">⏮</button>
-                    <button id="btnPlaySeg" title="Reproducir/Pausar">▶⏸</button>
-                    <button id="btnSeekEnd" title="Fin segmento">⏭</button>
-                    <div class="time-display" id="timeDisplay">0:00.0</div>
-                </div>
-            </div>
-
-            <!-- Timeline visual -->
-            <div class="timeline-visual">
-                <div class="timeline-visual-label" id="timelineLabel">Timeline</div>
-                <div class="timeline-bar-container" id="timelineBarContainer">
-                    <div class="timeline-playhead" id="timelinePlayhead"></div>
-                </div>
-            </div>
-
-            <!-- Subtitles list -->
-            <div class="subtitles-section">
-                <div class="subtitles-header">
-                    <span id="subCount">0 subtítulos</span>
-                    <button id="btnAddSub" title="Añadir nuevo">+ Añadir</button>
-                </div>
-                <div class="subtitles-list" id="subtitlesList"></div>
+            <div class="timeline" id="timeline">
+                <div class="timeline-ruler" id="timelineRuler"></div>
+                <div class="timeline-track" id="timelineTrack"></div>
+                <div class="timeline-playhead" id="playhead"></div>
             </div>
         </div>
     </div>
 
     <script>
+    (function(){
         // ===== STATE =====
-        let selectedFile = null;
-        let sessionId = null;
-        let segments = [];
-        let activeSegIdx = -1;
-        let videoDuration = 0;
+        let selectedFile = null, sessionId = null, segments = [], activeIdx = -1;
+        let videoDuration = 0, pxPerSec = 80; // ponytail: zoom level as px/sec
+        const UNDO = [], REDO = [], MAX_UNDO = 50;
+
+        const $ = id => document.getElementById(id);
 
         // ===== UNDO/REDO =====
-        const _undoStack = [];
-        const _redoStack = [];
-        const MAX_UNDO = 50;
-
-        function pushUndo() {
-            _undoStack.push(JSON.stringify(segments));
-            if (_undoStack.length > MAX_UNDO) _undoStack.shift();
-            _redoStack.length = 0;
-            updateUndoRedoButtons();
-        }
-
-        function undo() {
-            if (!_undoStack.length) return;
-            _redoStack.push(JSON.stringify(segments));
-            segments = JSON.parse(_undoStack.pop());
-            renderSubtitles(); saveSegments(); updateUndoRedoButtons();
-        }
-
-        function redo() {
-            if (!_redoStack.length) return;
-            _undoStack.push(JSON.stringify(segments));
-            segments = JSON.parse(_redoStack.pop());
-            renderSubtitles(); saveSegments(); updateUndoRedoButtons();
-        }
-
-        function updateUndoRedoButtons() {
-            $('btnUndo').disabled = !_undoStack.length;
-            $('btnRedo').disabled = !_redoStack.length;
-        }
-
-        // ===== ELEMENTS =====
-        const $ = id => document.getElementById(id);
-        const uploadArea = $('uploadArea');
-        const configSection = $('configSection');
-        const dropzone = $('dropzone');
-        const fileInput = $('fileInput');
-        const filename = $('filename');
-        const btnTranscribe = $('btnTranscribe');
-        const progress = $('progress');
-        const progressBar = $('progressBar');
-        const progressText = $('progressText');
-        const errorDiv = $('error');
-        const errorText = $('errorText');
-        const editor = $('editor');
-        const videoPlayer = $('videoPlayer');
-        const subtitlesList = $('subtitlesList');
-        const subCount = $('subCount');
-        const timeDisplay = $('timeDisplay');
-        const timelineBarContainer = $('timelineBarContainer');
-        const timelinePlayhead = $('timelinePlayhead');
+        function pushUndo() { UNDO.push(JSON.stringify(segments)); if (UNDO.length > MAX_UNDO) UNDO.shift(); REDO.length = 0; }
+        function undo() { if (!UNDO.length) return; REDO.push(JSON.stringify(segments)); segments = JSON.parse(UNDO.pop()); activeIdx = Math.min(activeIdx, segments.length-1); refresh(); }
+        function redo() { if (!REDO.length) return; UNDO.push(JSON.stringify(segments)); segments = JSON.parse(REDO.pop()); refresh(); }
 
         // ===== THEME =====
-        const saved = localStorage.getItem('theme') || 'dark';
-        document.documentElement.dataset.theme = saved;
-        $('themeToggle').textContent = saved === 'dark' ? '🌙' : '☀️';
-        $('themeToggle').onclick = () => {
-            const n = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-            document.documentElement.dataset.theme = n;
-            $('themeToggle').textContent = n === 'dark' ? '🌙' : '☀️';
-            localStorage.setItem('theme', n);
-        };
+        let theme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.dataset.theme = theme;
+        $('themeToggle').onclick = () => { theme = theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = theme; localStorage.setItem('theme', theme); };
 
         // ===== GPU =====
-        fetch('/gpu').then(r=>r.json()).then(d=>{
-            $('gpuBadge').innerHTML = d.gpu ? `<span style="color: var(--success);">●</span> GPU` : `<span style="color: #f59e0b;">●</span> CPU`;
-        });
+        fetch('/gpu').then(r=>r.json()).then(d=>{ $('gpuBadge').textContent = d.gpu ? 'GPU' : 'CPU'; });
 
         // ===== CONFIG =====
         $('configToggle').onclick = () => $('configPanel').classList.toggle('open');
@@ -458,39 +324,35 @@
         $('minDuration').oninput = e => $('minDurVal').textContent = parseFloat(e.target.value).toFixed(1) + ' s';
         $('maxRepeats').oninput = e => $('maxRepVal').textContent = e.target.value;
 
-        // ===== FILE HANDLING =====
+        // ===== UPLOAD =====
+        const dropzone = $('dropzone'), fileInput = $('fileInput');
         dropzone.onclick = () => fileInput.click();
-        fileInput.onchange = e => { if (e.target.files.length) handleFile(e.target.files[0]); };
+        fileInput.onchange = e => { if (e.target.files[0]) pickFile(e.target.files[0]); };
         dropzone.ondragover = e => { e.preventDefault(); dropzone.classList.add('dragover'); };
         dropzone.ondragleave = () => dropzone.classList.remove('dragover');
-        dropzone.ondrop = e => { e.preventDefault(); dropzone.classList.remove('dragover'); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); };
+        dropzone.ondrop = e => { e.preventDefault(); dropzone.classList.remove('dragover'); if (e.dataTransfer.files[0]) pickFile(e.dataTransfer.files[0]); };
 
-        function handleFile(file) {
-            selectedFile = file;
-            filename.textContent = `${file.name} (${(file.size/1024/1024).toFixed(1)} MB)`;
+        function pickFile(f) {
+            selectedFile = f;
+            $('filename').textContent = f.name + ' (' + (f.size/1024/1024).toFixed(1) + ' MB)';
             dropzone.classList.add('has-file');
-            btnTranscribe.disabled = false;
+            $('btnTranscribe').disabled = false;
         }
 
         // ===== TRANSCRIBE =====
-        btnTranscribe.onclick = async () => {
+        $('btnTranscribe').onclick = async () => {
             if (!selectedFile) return;
-            btnTranscribe.disabled = true;
-            btnTranscribe.innerHTML = '<span class="spinner"></span> Procesando...';
-            progress.classList.add('active');
-            errorDiv.style.display = 'none';
+            const btn = $('btnTranscribe');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Procesando...';
+            $('progress').classList.add('active');
+            $('error').style.display = 'none';
 
             let pct = 0;
             const iv = setInterval(() => {
-                pct = Math.min(pct + Math.random() * 3, 95);
-                progressBar.style.width = pct + '%';
-                if (pct < 15) progressText.textContent = 'Extrayendo audio...';
-                else if (pct < 25) progressText.textContent = 'Detectando silencios...';
-                else if (pct < 55) progressText.textContent = 'Transcribiendo...';
-                else if (pct < 65) progressText.textContent = 'Limpiando...';
-                else if (pct < 80) progressText.textContent = 'Traduciendo...';
-                else progressText.textContent = 'Preparando editor...';
-            }, 1000);
+                pct = Math.min(pct + Math.random()*3, 95);
+                $('progressBar').style.width = pct+'%';
+                $('progressText').textContent = pct < 20 ? 'Extrayendo audio...' : pct < 50 ? 'Transcribiendo...' : pct < 75 ? 'Traduciendo...' : 'Finalizando...';
+            }, 800);
 
             try {
                 const fd = new FormData();
@@ -504,315 +366,305 @@
 
                 const resp = await fetch('/transcribe', { method: 'POST', body: fd });
                 clearInterval(iv);
-                if (!resp.ok) { const d = await resp.json(); throw new Error(d.error); }
+                if (!resp.ok) throw new Error((await resp.json()).error);
 
                 const data = await resp.json();
                 sessionId = data.session_id;
                 segments = data.segments;
-
-                progressBar.style.width = '100%';
-                progressText.textContent = '¡Listo!';
+                $('progressBar').style.width = '100%';
+                $('progressText').textContent = 'Listo!';
 
                 setTimeout(() => {
-                    progress.classList.remove('active');
-                    uploadArea.hidden = true;
-                    editor.classList.add('active');
-                    _undoStack.length = 0; _redoStack.length = 0;
-                    openEditor(); 
-                    updateUndoRedoButtons();
-                }, 400);
-
-            } catch (err) {
+                    $('progress').classList.remove('active');
+                    $('uploadArea').hidden = true;
+                    $('editor').classList.add('active');
+                    UNDO.length = 0; REDO.length = 0;
+                    openEditor();
+                }, 300);
+            } catch(err) {
                 clearInterval(iv);
-                progress.classList.remove('active');
-                errorText.textContent = err.message;
-                errorDiv.style.display = 'block';
-                btnTranscribe.disabled = false;
-                btnTranscribe.innerHTML = 'Transcribir y editar subtítulos';
+                $('progress').classList.remove('active');
+                $('errorText').textContent = err.message;
+                $('error').style.display = 'block';
+                btn.disabled = false; btn.textContent = 'Transcribir';
             }
         };
 
         // ===== EDITOR =====
+        const videoPlayer = $('videoPlayer');
+        const timeline = $('timeline');
+        const track = $('timelineTrack');
+        const playhead = $('playhead');
+        const ruler = $('timelineRuler');
+
         function openEditor() {
-            videoPlayer.src = `/api/session/${sessionId}/video`;
-            renderSubtitles();
+            videoPlayer.src = '/api/session/' + sessionId + '/video';
+            videoPlayer.onloadedmetadata = () => { videoDuration = videoPlayer.duration; refresh(); };
         }
 
-        function renderSubtitles() {
-            subtitlesList.innerHTML = '';
-            subCount.textContent = `${segments.length} subtítulos`;
+        function refresh() {
             renderTimeline();
-
-            segments.forEach((seg, i) => {
-                const item = document.createElement('div');
-                item.className = 'sub-item' + (i === activeSegIdx ? ' active' : '');
-                item.dataset.idx = i;
-
-                item.innerHTML = `
-                    <div class="sub-num">${i + 1}</div>
-                    <input class="sub-time-input" type="text" value="${fmtTime(seg.start)}" data-idx="${i}" data-field="start" title="Inicio">
-                    <input class="sub-time-input" type="text" value="${fmtTime(seg.end)}" data-idx="${i}" data-field="end" title="Fin">
-                    <textarea class="sub-text" rows="2" data-idx="${i}" title="Texto del subtítulo">${escHtml(seg.text)}</textarea>
-                    <div class="sub-actions">
-                        <button class="sub-btn" data-action="play" data-idx="${i}" title="Reproducir">▶</button>
-                        <button class="sub-btn del" data-action="delete" data-idx="${i}" title="Eliminar">✕</button>
-                    </div>
-                `;
-                subtitlesList.appendChild(item);
-            });
-
-            // Event listeners
-            subtitlesList.onclick = e => {
-                const btn = e.target.closest('[data-action]');
-                if (!btn) return;
-                const idx = parseInt(btn.dataset.idx);
-                if (btn.dataset.action === 'play') playSegment(idx);
-                else if (btn.dataset.action === 'delete') {
-                    pushUndo();
-                    segments.splice(idx, 1);
-                    if (activeSegIdx >= segments.length) activeSegIdx = segments.length - 1;
-                    renderSubtitles(); saveSegments();
-                }
-            };
-
-            // Text editing
-            subtitlesList.querySelectorAll('.sub-text').forEach(el => {
-                let prev = '';
-                el.onfocus = () => { prev = el.value; activeSegIdx = parseInt(el.dataset.idx); highlightActive(); };
-                el.oninput = () => { segments[parseInt(el.dataset.idx)].text = el.value; saveDebounced(); };
-                el.onblur = () => { if (el.value !== prev) pushUndo(); };
-            });
-
-            // Time editing
-            subtitlesList.querySelectorAll('.sub-time-input').forEach(el => {
-                let prev = el.value;
-                el.onfocus = () => { prev = el.value; };
-                el.onchange = () => {
-                    const val = parseTime(el.value);
-                    if (val !== null) { pushUndo(); segments[parseInt(el.dataset.idx)][el.dataset.field] = val; saveDebounced(); }
-                    else el.value = prev;
-                };
-            });
-
-            highlightActive();
+            renderEditPanel();
+            updateOverlay();
+            saveSegments();
         }
 
+        // ===== TIMELINE RENDER =====
         function renderTimeline() {
             if (!videoDuration) return;
-            const bars = subtitlesList.parentElement.querySelectorAll('.timeline-bar');
-            bars.forEach(b => b.remove());
+            const totalW = videoDuration * pxPerSec;
+            track.style.width = totalW + 'px';
+            ruler.style.width = totalW + 'px';
+            timeline.style.width = '100%';
 
+            // Ruler ticks
+            ruler.innerHTML = '';
+            const step = pxPerSec >= 60 ? 1 : pxPerSec >= 30 ? 2 : 5;
+            for (let t = 0; t <= videoDuration; t += step) {
+                const tick = document.createElement('div');
+                tick.className = 'tick';
+                tick.style.left = (t * pxPerSec) + 'px';
+                tick.textContent = fmtShort(t);
+                ruler.appendChild(tick);
+            }
+
+            // Blocks
+            track.innerHTML = '';
             segments.forEach((seg, i) => {
-                const bar = document.createElement('div');
-                bar.className = 'timeline-bar' + (i === activeSegIdx ? ' active' : '');
-                bar.dataset.idx = i;
-                
-                const dur = videoDuration;
-                const left = (seg.start / dur) * 100;
-                const width = ((seg.end - seg.start) / dur) * 100;
-                
-                bar.style.left = left + '%';
-                bar.style.width = Math.max(width, 2) + '%';
-                
-                bar.onclick = () => { activeSegIdx = i; highlightActive(); playSegment(i); };
-                timelineBarContainer.appendChild(bar);
+                const block = document.createElement('div');
+                block.className = 'timeline-block' + (i === activeIdx ? ' active' : '');
+                block.style.left = (seg.start * pxPerSec) + 'px';
+                block.style.width = Math.max((seg.end - seg.start) * pxPerSec, 20) + 'px';
+                block.textContent = seg.text.substring(0, 30);
+                block.dataset.idx = i;
+
+                // Resize handles
+                const rl = document.createElement('div'); rl.className = 'resize-l';
+                const rr = document.createElement('div'); rr.className = 'resize-r';
+                block.appendChild(rl); block.appendChild(rr);
+
+                // Click to select
+                block.onmousedown = e => {
+                    if (e.target === rl || e.target === rr) return;
+                    activeIdx = i; renderEditPanel(); highlightBlocks(); updateOverlay();
+                };
+
+                // Resize left
+                rl.onmousedown = e => { e.stopPropagation(); startResize(e, i, 'left'); };
+                rr.onmousedown = e => { e.stopPropagation(); startResize(e, i, 'right'); };
+
+                track.appendChild(block);
             });
         }
 
-        function highlightActive() {
-            subtitlesList.querySelectorAll('.sub-item').forEach((r, i) => r.classList.toggle('active', i === activeSegIdx));
-            timelineBarContainer.querySelectorAll('.timeline-bar').forEach((b, i) => b.classList.toggle('active', i === activeSegIdx));
+        function highlightBlocks() {
+            track.querySelectorAll('.timeline-block').forEach((b, i) => b.classList.toggle('active', i === activeIdx));
         }
 
-        function playSegment(idx) {
-            activeSegIdx = idx;
-            highlightActive();
+        // ===== RESIZE DRAG =====
+        function startResize(e, idx, side) {
+            pushUndo();
             const seg = segments[idx];
-            videoPlayer.currentTime = seg.start;
-            videoPlayer.play();
-            const checker = () => {
-                if (videoPlayer.currentTime >= seg.end || videoPlayer.paused) {
-                    videoPlayer.pause();
-                    videoPlayer.removeEventListener('timeupdate', checker);
+            const startX = e.clientX;
+            const origStart = seg.start, origEnd = seg.end;
+
+            function onMove(e2) {
+                const dx = (e2.clientX - startX) / pxPerSec;
+                if (side === 'left') {
+                    seg.start = Math.max(0, Math.min(origStart + dx, seg.end - 0.2));
+                } else {
+                    seg.end = Math.min(videoDuration, Math.max(origEnd + dx, seg.start + 0.2));
                 }
-            };
-            videoPlayer.addEventListener('timeupdate', checker);
+                renderTimeline(); renderEditPanel();
+            }
+            function onUp() { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); saveSegments(); }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
         }
 
-        let saveTimeout;
-        function saveDebounced() { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveSegments, 500); }
+        // ===== EDIT PANEL =====
+        function renderEditPanel() {
+            const container = $('editSegment');
+            if (activeIdx < 0 || activeIdx >= segments.length) {
+                container.innerHTML = '<div class="empty">Selecciona un subt&iacute;tulo en la l&iacute;nea de tiempo</div>';
+                return;
+            }
+            const seg = segments[activeIdx];
+            container.innerHTML = `
+                <div class="edit-label">Texto (#${activeIdx+1} de ${segments.length})</div>
+                <textarea class="edit-textarea" id="editText">${escHtml(seg.text)}</textarea>
+                <div class="edit-label">Tiempos</div>
+                <div class="edit-time-row">
+                    <input class="edit-time-input" id="editStart" value="${fmtTime(seg.start)}">
+                    <input class="edit-time-input" id="editEnd" value="${fmtTime(seg.end)}">
+                </div>
+            `;
+            $('editText').oninput = () => { seg.text = $('editText').value; updateOverlay(); renderTimeline(); saveDebounced(); };
+            $('editText').onfocus = () => { };
+            $('editText').onblur = () => { pushUndo(); };
+            $('editStart').onchange = () => { const v = parseTime($('editStart').value); if (v !== null) { pushUndo(); seg.start = v; renderTimeline(); saveSegments(); } };
+            $('editEnd').onchange = () => { const v = parseTime($('editEnd').value); if (v !== null) { pushUndo(); seg.end = v; renderTimeline(); saveSegments(); } };
+        }
+
+        // ===== SUBTITLE OVERLAY =====
+        function updateOverlay() {
+            const overlay = $('subOverlay');
+            const text = $('subOverlayText');
+            const t = videoPlayer.currentTime;
+            let current = null;
+            for (let i = 0; i < segments.length; i++) {
+                if (t >= segments[i].start && t <= segments[i].end) { current = segments[i]; break; }
+            }
+            // Also show active segment text while editing
+            if (!current && activeIdx >= 0 && activeIdx < segments.length && document.activeElement && document.activeElement.id === 'editText') {
+                current = segments[activeIdx];
+            }
+            if (current && current.text.trim()) {
+                text.textContent = current.text;
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        // ===== PLAYHEAD + VIDEO SYNC =====
+        videoPlayer.ontimeupdate = () => {
+            const t = videoPlayer.currentTime;
+            $('timeDisplay').textContent = fmtTime(t);
+            playhead.style.left = (t * pxPerSec) + 'px';
+            updateOverlay();
+
+            // Auto-select current segment
+            for (let i = 0; i < segments.length; i++) {
+                if (t >= segments[i].start && t <= segments[i].end) {
+                    if (i !== activeIdx) { activeIdx = i; highlightBlocks(); renderEditPanel(); }
+                    break;
+                }
+            }
+
+            // Auto-scroll timeline
+            const scrollLeft = timeline.scrollLeft;
+            const viewW = timeline.clientWidth;
+            const headPos = t * pxPerSec;
+            if (headPos < scrollLeft || headPos > scrollLeft + viewW - 50) {
+                timeline.scrollLeft = headPos - viewW / 3;
+            }
+        };
+
+        // Click on ruler/track to seek
+        timeline.onmousedown = e => {
+            if (e.target.closest('.timeline-block')) return;
+            const rect = timeline.getBoundingClientRect();
+            const x = e.clientX - rect.left + timeline.scrollLeft;
+            videoPlayer.currentTime = Math.max(0, Math.min(x / pxPerSec, videoDuration));
+        };
+
+        // ===== TOOLBAR ACTIONS =====
+        $('btnPlay').onclick = () => { videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause(); };
+        $('btnSplit').onclick = () => splitAtPlayhead();
+        $('btnDelete').onclick = () => deleteActive();
+        $('btnAdd').onclick = () => addSegment();
+        $('btnZoomIn').onclick = () => { pxPerSec = Math.min(pxPerSec * 1.5, 300); renderTimeline(); };
+        $('btnZoomOut').onclick = () => { pxPerSec = Math.max(pxPerSec / 1.5, 15); renderTimeline(); };
+        $('btnUndo').onclick = undo;
+        $('btnRedo').onclick = redo;
+
+        function splitAtPlayhead() {
+            if (activeIdx < 0) return;
+            const seg = segments[activeIdx];
+            const t = videoPlayer.currentTime;
+            const splitAt = (t > seg.start + 0.1 && t < seg.end - 0.1) ? t : (seg.start + seg.end) / 2;
+            pushUndo();
+            const words = seg.text.split(/\s+/);
+            const mid = Math.ceil(words.length / 2);
+            segments.splice(activeIdx, 1,
+                { start: seg.start, end: splitAt, text: words.slice(0, mid).join(' ') },
+                { start: splitAt, end: seg.end, text: words.slice(mid).join(' ') }
+            );
+            refresh();
+        }
+
+        function deleteActive() {
+            if (activeIdx < 0) return;
+            pushUndo();
+            segments.splice(activeIdx, 1);
+            activeIdx = Math.min(activeIdx, segments.length - 1);
+            refresh();
+        }
+
+        function addSegment() {
+            pushUndo();
+            const t = videoPlayer.currentTime;
+            segments.push({ start: t, end: t + 2, text: '' });
+            activeIdx = segments.length - 1;
+            refresh();
+        }
+
+        // ===== SAVE =====
+        let saveTO;
+        function saveDebounced() { clearTimeout(saveTO); saveTO = setTimeout(saveSegments, 500); }
         function saveSegments() {
-            fetch(`/api/session/${sessionId}/segments`, {
+            if (!sessionId) return;
+            fetch('/api/session/' + sessionId + '/segments', {
                 method: 'PUT', headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({segments})
             });
         }
 
-        $('btnAddSub').onclick = () => {
-            pushUndo();
-            const lastEnd = segments.length ? segments[segments.length-1].end : 0;
-            segments.push({start: lastEnd, end: lastEnd + 2, text: ''});
-            renderSubtitles(); saveSegments();
-            subtitlesList.scrollTop = subtitlesList.scrollHeight;
-        };
-
-        videoPlayer.onloadedmetadata = () => {
-            videoDuration = videoPlayer.duration;
-            renderTimeline();
-        };
-
-        videoPlayer.ontimeupdate = () => {
-            timeDisplay.textContent = fmtTime(videoPlayer.currentTime);
-            timelinePlayhead.style.left = (videoPlayer.currentTime / videoDuration * 100) + '%';
-            
-            const t = videoPlayer.currentTime;
-            let found = -1;
-            for (let i = 0; i < segments.length; i++) {
-                if (t >= segments[i].start && t <= segments[i].end) { found = i; break; }
-            }
-            if (found !== -1 && found !== activeSegIdx) {
-                activeSegIdx = found;
-                highlightActive();
-                const item = subtitlesList.children[found];
-                if (item) item.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-            }
-        };
-
-        $('btnPlaySeg').onclick = () => { if (activeSegIdx >= 0) playSegment(activeSegIdx); else videoPlayer.play(); };
-        $('btnSeekStart').onclick = () => { if (activeSegIdx >= 0) videoPlayer.currentTime = segments[activeSegIdx].start; };
-        $('btnSeekEnd').onclick = () => { if (activeSegIdx >= 0) videoPlayer.currentTime = segments[activeSegIdx].end; };
-
-        // New video
+        // ===== EXPORT =====
         $('btnNewVideo').onclick = () => {
-            editor.classList.remove('active');
-            uploadArea.hidden = false;
+            $('editor').classList.remove('active');
+            $('uploadArea').hidden = false;
             videoPlayer.pause(); videoPlayer.src = '';
-            selectedFile = null; fileInput.value = ''; filename.textContent = '';
+            selectedFile = null; fileInput.value = ''; $('filename').textContent = '';
             dropzone.classList.remove('has-file');
-            btnTranscribe.disabled = true;
-            btnTranscribe.innerHTML = 'Transcribir y editar subtítulos';
-            progress.classList.remove('active');
-            progressBar.style.width = '0%';
-            errorDiv.style.display = 'none';
-            _undoStack.length = 0; _redoStack.length = 0;
-            activeSegIdx = -1;
+            $('btnTranscribe').disabled = true; $('btnTranscribe').textContent = 'Transcribir';
+            $('error').style.display = 'none';
+            UNDO.length = 0; REDO.length = 0; activeIdx = -1;
         };
 
-        // Download SRT
-        $('btnDownloadSrt').onclick = () => { window.location.href = `/api/session/${sessionId}/srt`; };
+        $('btnDownloadSrt').onclick = () => { window.location.href = '/api/session/' + sessionId + '/srt'; };
 
-        // Burn
         $('btnBurn').onclick = async () => {
             const btn = $('btnBurn');
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Quemando...';
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
             try {
-                const resp = await fetch(`/api/session/${sessionId}/burn`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
-                });
-                if (!resp.ok) { const d = await resp.json(); throw new Error(d.error); }
+                const resp = await fetch('/api/session/' + sessionId + '/burn', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' });
+                if (!resp.ok) throw new Error((await resp.json()).error);
                 const blob = await resp.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url;
-                a.download = `subtitled.${selectedFile ? selectedFile.name.split('.').pop() : 'mp4'}`;
-                a.click(); URL.revokeObjectURL(url);
-            } catch (err) { alert('Error: ' + err.message); }
-            btn.disabled = false; btn.innerHTML = 'Quemar en video';
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+                a.download = 'subtitled.' + (selectedFile ? selectedFile.name.split('.').pop() : 'mp4');
+                a.click(); URL.revokeObjectURL(a.href);
+            } catch(err) { alert(err.message); }
+            btn.disabled = false; btn.textContent = 'Quemar';
         };
 
-        // Batch export
-        $('btnBatchExport').onclick = async () => {
-            const btn = $('btnBatchExport');
-            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Exportando...';
-            try {
-                const srtLink = document.createElement('a');
-                srtLink.href = `/api/session/${sessionId}/srt`;
-                srtLink.download = 'subtitles.srt';
-                srtLink.click();
-                const resp = await fetch(`/api/session/${sessionId}/burn`, {
-                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
-                });
-                if (!resp.ok) { const d = await resp.json(); throw new Error(d.error); }
-                const blob = await resp.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url;
-                a.download = `subtitled.${selectedFile ? selectedFile.name.split('.').pop() : 'mp4'}`;
-                a.click(); URL.revokeObjectURL(url);
-            } catch (err) { alert('Error: ' + err.message); }
-            btn.disabled = false; btn.innerHTML = '📦 Exportar todo';
+        $('btnExportAll').onclick = async () => {
+            $('btnDownloadSrt').click();
+            await new Promise(r => setTimeout(r, 500));
+            $('btnBurn').click();
         };
 
-        // ===== KEYBOARD SHORTCUTS =====
-        const isInput = () => {
-            const el = document.activeElement;
-            return el && (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT');
-        };
-
+        // ===== KEYBOARD =====
         document.addEventListener('keydown', e => {
+            const inInput = document.activeElement && (document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT');
             if (e.ctrlKey && e.key === 'z' && !e.shiftKey) { e.preventDefault(); undo(); return; }
             if (e.ctrlKey && (e.key === 'Z' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); redo(); return; }
             if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); return; }
-
-            if (isInput()) return;
-
-            if (e.key === ' ') {
-                e.preventDefault();
-                if (activeSegIdx >= 0) {
-                    if (videoPlayer.paused) playSegment(activeSegIdx);
-                    else videoPlayer.pause();
-                } else {
-                    videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause();
-                }
-            }
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                if (activeSegIdx >= 0) {
-                    e.preventDefault();
-                    pushUndo();
-                    segments.splice(activeSegIdx, 1);
-                    if (activeSegIdx >= segments.length) activeSegIdx = segments.length - 1;
-                    renderSubtitles(); saveSegments();
-                }
-            }
-            if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (segments.length) {
-                    activeSegIdx = activeSegIdx <= 0 ? segments.length - 1 : activeSegIdx - 1;
-                    highlightActive();
-                    const item = subtitlesList.children[activeSegIdx];
-                    if (item) item.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-                }
-            }
-            if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (segments.length) {
-                    activeSegIdx = activeSegIdx >= segments.length - 1 ? 0 : activeSegIdx + 1;
-                    highlightActive();
-                    const item = subtitlesList.children[activeSegIdx];
-                    if (item) item.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-                }
-            }
-            if (e.key === 'Escape') {
-                activeSegIdx = -1;
-                highlightActive();
-                document.activeElement.blur();
-            }
+            if (inInput) return;
+            if (e.key === ' ') { e.preventDefault(); videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause(); }
+            if (e.key === 'Delete') { e.preventDefault(); deleteActive(); }
+            if (e.key === 's' || e.key === 'S') { e.preventDefault(); splitAtPlayhead(); }
+            if (e.key === 'ArrowUp') { e.preventDefault(); if (segments.length) { activeIdx = activeIdx <= 0 ? segments.length-1 : activeIdx-1; highlightBlocks(); renderEditPanel(); } }
+            if (e.key === 'ArrowDown') { e.preventDefault(); if (segments.length) { activeIdx = activeIdx >= segments.length-1 ? 0 : activeIdx+1; highlightBlocks(); renderEditPanel(); } }
         });
 
         // ===== UTILS =====
-        function fmtTime(sec) {
-            if (sec == null || isNaN(sec)) return '0:00.0';
-            const m = Math.floor(sec / 60);
-            const s = (sec % 60).toFixed(1);
-            return `${m}:${s.padStart(4, '0')}`;
-        }
-        function parseTime(str) {
-            try {
-                if (str.includes(':')) { const [m, s] = str.split(':'); return parseInt(m) * 60 + parseFloat(s); }
-                return parseFloat(str);
-            } catch { return null; }
-        }
-        function escHtml(s) {
-            return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        }
+        function fmtTime(sec) { if (sec == null || isNaN(sec)) return '0:00.0'; const m = Math.floor(sec/60); return m + ':' + (sec%60).toFixed(1).padStart(4,'0'); }
+        function fmtShort(sec) { const m = Math.floor(sec/60); const s = Math.floor(sec%60); return m + ':' + String(s).padStart(2,'0'); }
+        function parseTime(str) { try { if (str.includes(':')) { const [m,s] = str.split(':'); return parseInt(m)*60 + parseFloat(s); } return parseFloat(str); } catch { return null; } }
+        function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    })();
     </script>
 </body>
 </html>
