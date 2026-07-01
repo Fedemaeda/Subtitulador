@@ -49,7 +49,7 @@
         }
 
         /* Main content */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
 
         /* Upload section */
         .upload-area { padding: 1.5rem; max-width: 700px; margin: 0 auto; }
@@ -132,35 +132,46 @@
         .editor-btn:hover:not(:disabled) { opacity: 0.9; }
         .editor-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        /* Video section - full width */
+        /* Video section - tamaño moderado */
         .video-section { 
-            flex: 0 0 50%; padding: 1rem; background: #000; border-bottom: 1px solid var(--border);
-            display: flex; flex-direction: column; gap: 0.5rem;
+            flex: 0 0 auto; padding: 1rem; background: var(--surface); border-bottom: 1px solid var(--border);
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+            max-height: 35vh;
+        }
+        @media (max-width: 1024px) {
+            .video-section { grid-template-columns: 1fr; max-height: 45vh; }
         }
         .video-box {
-            flex: 1; background: #000; border-radius: 12px; overflow: hidden;
+            background: #000; border-radius: 12px; overflow: hidden;
             border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+            aspect-ratio: 16/9;
         }
         .video-box video { width: 100%; height: 100%; object-fit: contain; }
-        .video-controls { display: flex; gap: 0.5rem; align-items: center; }
+        .video-controls { 
+            display: flex; flex-direction: column; gap: 0.5rem;
+            background: var(--surface2); border-radius: 12px; padding: 0.8rem;
+            border: 1px solid var(--border);
+        }
+        .video-controls-row { display: flex; gap: 0.3rem; }
         .video-controls button {
-            background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
-            padding: 0.3rem 0.6rem; color: var(--text); cursor: pointer; font-size: 0.8rem;
+            background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+            padding: 0.5rem 0.8rem; color: var(--text); cursor: pointer; font-size: 0.8rem;
+            flex: 1;
         }
         .video-controls button:hover { border-color: var(--accent); }
         .time-display {
-            font-family: 'Consolas', monospace; font-size: 0.8rem; color: var(--text2);
-            margin-left: auto;
+            font-family: 'Consolas', monospace; font-size: 0.9rem; color: var(--text2);
+            text-align: center; padding: 0.5rem;
         }
 
         /* Visual timeline */
         .timeline-visual {
-            padding: 1rem; background: var(--surface); border-bottom: 1px solid var(--border);
-            flex: 0 0 100px;
+            padding: 0.8rem; background: var(--surface); border-bottom: 1px solid var(--border);
+            flex: 0 0 70px;
         }
-        .timeline-visual-label { font-size: 0.8rem; color: var(--text2); margin-bottom: 0.5rem; }
+        .timeline-visual-label { font-size: 0.75rem; color: var(--text3); margin-bottom: 0.3rem; }
         .timeline-bar-container {
-            position: relative; height: 60px; background: var(--bg); border-radius: 8px;
+            position: relative; height: 50px; background: var(--bg); border-radius: 6px;
             border: 1px solid var(--border); overflow: hidden;
         }
         .timeline-bar {
@@ -178,6 +189,7 @@
         .subtitles-section {
             flex: 1; display: flex; flex-direction: column; overflow: hidden;
             padding: 1rem; background: var(--surface); border-top: 1px solid var(--border);
+            min-height: 300px;
         }
         .subtitles-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
         .subtitles-header span { font-size: 0.85rem; color: var(--text2); flex: 1; }
@@ -348,10 +360,12 @@
                     <video id="videoPlayer" controls></video>
                 </div>
                 <div class="video-controls">
-                    <button id="btnSeekStart" title="Inicio segmento">⏮</button>
-                    <button id="btnPlaySeg" title="Reproducir segmento">▶</button>
-                    <button id="btnSeekEnd" title="Fin segmento">⏭</button>
-                    <span class="time-display" id="timeDisplay">0:00.0</span>
+                    <div class="video-controls-row">
+                        <button id="btnSeekStart" title="Inicio segmento">⏮</button>
+                        <button id="btnPlaySeg" title="Reproducir/Pausar">▶/⏸</button>
+                        <button id="btnSeekEnd" title="Fin segmento">⏭</button>
+                    </div>
+                    <div class="time-display" id="timeDisplay">0:00.0</div>
                 </div>
             </div>
 
