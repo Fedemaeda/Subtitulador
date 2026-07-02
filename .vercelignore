@@ -1,0 +1,14 @@
+.git
+.gitignore
+*.md
+TODO.md
+tests/
+graphify-out/
+static/
+templates/index_modular.html
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+.DS_Store
