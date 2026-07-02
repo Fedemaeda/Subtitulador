@@ -1,4 +1,12 @@
+# Core dependencies
 faster-whisper
 flask
 deep-translator
 torch
+
+# Development dependencies
+pytest
+black
+
+# Optional: GPU support
+# torch+cuda (install manually if needed)

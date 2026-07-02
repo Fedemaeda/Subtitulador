@@ -1,0 +1,880 @@
+{
+  "nodes": [
+    {
+      "id": "app",
+      "label": "app.py",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_get_model",
+      "label": "get_model()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L35",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_contains_cjk",
+      "label": "_contains_cjk()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L50",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_translate_chunk",
+      "label": "_translate_chunk()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L54",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_translate_text_smart",
+      "label": "translate_text_smart()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L65",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_detect_silence",
+      "label": "detect_silence()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L80",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_is_in_silence",
+      "label": "_is_in_silence()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L106",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_is_hallucination",
+      "label": "_is_hallucination()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L119",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_tighten_timings",
+      "label": "_tighten_timings()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L147",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_generate_srt",
+      "label": "generate_srt()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L182",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_create_session",
+      "label": "_create_session()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L200",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_get_session",
+      "label": "_get_session()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L220",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_cleanup_old_sessions",
+      "label": "_cleanup_old_sessions()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L225",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_index",
+      "label": "index()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L240",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_list_models",
+      "label": "list_models()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L245",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_gpu_info",
+      "label": "gpu_info()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L250",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_transcribe",
+      "label": "transcribe()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L255",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_get_segments",
+      "label": "get_segments()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L322",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_save_segments",
+      "label": "save_segments()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L334",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_get_video",
+      "label": "get_video()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L348",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_get_srt",
+      "label": "get_srt()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L357",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_burn_subtitles",
+      "label": "burn_subtitles()",
+      "file_type": "code",
+      "source_file": "app.py",
+      "source_location": "L374",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_1",
+      "label": "Subtitulador - Transcribe, edit and burn subtitles.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_81",
+      "label": "Detect silences with improved sensitivity for better subtitle separation.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L81",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_107",
+      "label": "Check if a segment overlaps significantly with silence.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L107",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_120",
+      "label": "Filter out hallucinated segments with adjusted thresholds.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L120",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_148",
+      "label": "Adjust timings to align better with detected silences.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L148",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_256",
+      "label": "Transcribe video and return session ID + segments for editing.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L256",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_323",
+      "label": "Get current segments for a session.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L323",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_335",
+      "label": "Save edited segments.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L335",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_349",
+      "label": "Get the original video for preview.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L349",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_358",
+      "label": "Download the current SRT file.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L358",
+      "_origin": "ast"
+    },
+    {
+      "id": "app_rationale_375",
+      "label": "Burn edited subtitles into video and return the result.",
+      "file_type": "rationale",
+      "source_file": "app.py",
+      "source_location": "L375",
+      "_origin": "ast"
+    }
+  ],
+  "edges": [
+    {
+      "source": "app",
+      "target": "os",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "uuid",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "json",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "time",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "tempfile",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "subprocess",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "re",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "threading",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "pathlib",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "flask",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "werkzeug_utils",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "torch",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "faster_whisper",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_get_model",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "deep_translator",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_contains_cjk",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_translate_chunk",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_translate_text_smart",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L65",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_detect_silence",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_is_in_silence",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L106",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_is_hallucination",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L119",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_tighten_timings",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L147",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_generate_srt",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L182",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_create_session",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L200",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_get_session",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L220",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_cleanup_old_sessions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L225",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_index",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L240",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_list_models",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L245",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_gpu_info",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L250",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_transcribe",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L255",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_get_segments",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L322",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_save_segments",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L334",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_get_video",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L348",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_get_srt",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L357",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "app_burn_subtitles",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L374",
+      "weight": 1.0
+    },
+    {
+      "source": "app",
+      "target": "argparse",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L412",
+      "weight": 1.0
+    },
+    {
+      "source": "app_translate_text_smart",
+      "target": "app_contains_cjk",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "app_translate_text_smart",
+      "target": "app_translate_chunk",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "app_tighten_timings",
+      "target": "app_is_in_silence",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L157",
+      "weight": 1.0
+    },
+    {
+      "source": "app_transcribe",
+      "target": "app_cleanup_old_sessions",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L272",
+      "weight": 1.0
+    },
+    {
+      "source": "app_transcribe",
+      "target": "app_detect_silence",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L286",
+      "weight": 1.0
+    },
+    {
+      "source": "app_transcribe",
+      "target": "app_get_model",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L288",
+      "weight": 1.0
+    },
+    {
+      "source": "app_transcribe",
+      "target": "app_is_hallucination",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L296",
+      "weight": 1.0
+    },
+    {
+      "source": "app_transcribe",
+      "target": "app_tighten_timings",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L297",
+      "weight": 1.0
+    },
+    {
+      "source": "app_transcribe",
+      "target": "app_translate_text_smart",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L301",
+      "weight": 1.0
+    },
+    {
+      "source": "app_transcribe",
+      "target": "app_create_session",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L304",
+      "weight": 1.0
+    },
+    {
+      "source": "app_get_segments",
+      "target": "app_get_session",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L324",
+      "weight": 1.0
+    },
+    {
+      "source": "app_save_segments",
+      "target": "app_get_session",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L336",
+      "weight": 1.0
+    },
+    {
+      "source": "app_get_video",
+      "target": "app_get_session",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L350",
+      "weight": 1.0
+    },
+    {
+      "source": "app_get_srt",
+      "target": "app_get_session",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L359",
+      "weight": 1.0
+    },
+    {
+      "source": "app_get_srt",
+      "target": "app_generate_srt",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L366",
+      "weight": 1.0
+    },
+    {
+      "source": "app_burn_subtitles",
+      "target": "app_get_session",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L376",
+      "weight": 1.0
+    },
+    {
+      "source": "app_burn_subtitles",
+      "target": "app_generate_srt",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L386",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_1",
+      "target": "app",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_81",
+      "target": "app_detect_silence",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L81",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_107",
+      "target": "app_is_in_silence",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L107",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_120",
+      "target": "app_is_hallucination",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_148",
+      "target": "app_tighten_timings",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L148",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_256",
+      "target": "app_transcribe",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L256",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_323",
+      "target": "app_get_segments",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L323",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_335",
+      "target": "app_save_segments",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L335",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_349",
+      "target": "app_get_video",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L349",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_358",
+      "target": "app_get_srt",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L358",
+      "weight": 1.0
+    },
+    {
+      "source": "app_rationale_375",
+      "target": "app_burn_subtitles",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "app.py",
+      "source_location": "L375",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

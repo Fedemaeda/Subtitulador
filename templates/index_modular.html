@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subtitulador</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Subtitulador</h1>
+        <span id="uiVersion" class="hdr-btn" style="cursor:default; padding:0.15rem 0.4rem; font-size:0.9rem; opacity:0.9;">v2.0</span>
+        <span id="gpuBadge" class="hdr-btn" style="cursor:default;" aria-label="Estado GPU/CPU">CPU</span>
+        <button class="hdr-btn" id="videoCompactToggle" aria-label="Alternar video compacto">🗜️</button>
+        <button class="hdr-btn" id="themeToggle" aria-label="Cambiar tema">🌙</button>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-box">
+            <div class="dropzone" id="dropzone">
+                <input type="file" id="fileInput" accept="video/*">
+                <div class="icon">🎬</div>
+                <div class="label">Arrastra un video o haz clic</div>
+                <div class="hint">MP4, MKV, AVI, MOV, WebM — hasta 2 GB</div>
+                <div class="filename" id="filename"></div>
+            </div>
+            <button class="config-toggle" id="configToggle">⚙ Configuración avanzada</button>
+            <div class="config-panel" id="configPanel">
+                <div class="config-row">
+                    <div class="config-item"><label>Modelo</label><select id="modelSelect"><option value="tiny">tiny</option><option value="base" selected>base</option><option value="small">small</option><option value="medium">medium</option><option value="large-v3">large-v3</option></select></div>
+                    <div class="config-item"><label>Silencio</label><input type="range" id="noiseThreshold" min="-50" max="-10" value="-30" step="5"><div class="range-val" id="noiseVal">-30 dB</div></div>
+                    <div class="config-item"><label>Dur. mín.</label><input type="range" id="minDuration" min="0.2" max="2.0" value="0.4" step="0.1"><div class="range-val" id="minDurVal">0.4 s</div></div>
+                    <div class="config-item"><label>Max repet.</label><input type="range" id="maxRepeats" min="1" max="10" value="3" step="1"><div class="range-val" id="maxRepVal">3</div></div>
+                </div>
+            </div>
+            <div class="options-row" aria-label="Configuración de idiomas">
+                <div class="options"><label>Audio:</label><select id="language"><option value="">Auto</option><option value="es">ES</option><option value="en">EN</option><option value="ja">JA</option><option value="pt">PT</option><option value="fr">FR</option><option value="de">DE</option><option value="it">IT</option><option value="ko">KO</option><option value="zh">ZH</option><option value="ru">RU</option><option value="ar">AR</option></select></div>
+                <div class="options"><label>Subs:</label><select id="targetLanguage"><option value="">Sin trad.</option><option value="es" selected>ES</option><option value="en">EN</option><option value="ja">JA</option><option value="pt">PT</option><option value="fr">FR</option><option value="de">DE</option><option value="it">IT</option><option value="ko">KO</option><option value="zh">ZH</option><option value="ru">RU</option><option value="ar">AR</option></select></div>
+            </div>
+            <button class="btn-go" id="btnTranscribe" disabled aria-label="Transcribir video">Transcribir</button>
+            <div class="progress-container" id="progress" role="status" aria-live="polite">
+                <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+                <div class="progress-text" id="progressText">Preparando...</div>
+            </div>
+            <div class="error" id="error" role="alert"><span id="errorText"></span></div>
+        </div>
+    </div>
+
+    <!-- EDITOR -->
+    <div class="editor" id="editor">
+        <div class="editor-top">
+            <div class="preview">
+                <video id="videoPlayer" controls></video>
+                <div class="sub-overlay" id="subOverlay"><span id="subOverlayText"></span></div>
+            </div>
+            <div class="divider" id="divider"></div>
+            <div class="edit-panel" id="editPanel">
+                <div class="edit-panel-header">
+                    <span class="title">Editar</span>
+                    <button class="ep-btn" id="btnUndo" title="Ctrl+Z" aria-label="Deshacer" disabled>↩</button>
+                    <button class="ep-btn" id="btnRedo" title="Ctrl+Shift+Z" aria-label="Rehacer" disabled>↪</button>
+                    <button class="ep-btn" id="btnNewVideo" aria-label="Empezar con otro video" disabled>Otro</button>
+                    <button class="ep-btn" id="btnDownloadSrt" aria-label="Descargar SRT" disabled>SRT</button>
+                    <button class="ep-btn accent" id="btnBurn" aria-label="Quemar subtítulos" disabled>Quemar</button>
+                </div>
+                <div class="edit-segment" id="editSegment">
+                    <div class="empty">Selecciona un subtítulo en la línea de tiempo</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="h-divider" id="hDivider"></div>
+        
+        <div class="editor-bottom" id="editorBottom">
+            <div class="toolbar" aria-label="Herramientas del editor">
+                <button class="tb-btn" id="btnPlay" aria-label="Play/Pause" disabled>▶</button>
+                <span class="time-display" id="timeDisplay">0:00.0</span>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="btnSplit" title="Cortar (S)" aria-label="Cortar (S)" disabled>✂</button>
+                <button class="tb-btn" id="btnDelete" title="Eliminar (Del)" aria-label="Eliminar (Del)" disabled>✖</button>
+                <button class="tb-btn" id="btnAdd" title="Añadir" aria-label="Añadir" disabled>+</button>
+                <div class="tb-sep"></div>
+                <button class="tb-btn" id="btnZoomIn" aria-label="Zoom in" disabled>+🔍</button>
+                <button class="tb-btn" id="btnZoomOut" aria-label="Zoom out" disabled>-🔍</button>
+                <span style="flex:1"></span>
+                <button class="tb-btn" id="btnExportAll" aria-label="Exportar" disabled>📦 Exportar</button>
+            </div>
+            <div class="timeline" id="timeline">
+                <div class="timeline-ruler" id="timelineRuler"></div>
+                <div class="timeline-track" id="timelineTrack"></div>
+                <div class="timeline-playhead" id="playhead"></div>
+                <div class="cut-line" id="cutLine" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>
