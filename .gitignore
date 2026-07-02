@@ -12,3 +12,5 @@ venv/
 *.avi
 *.mov
 *.webm
+
+.vercel
