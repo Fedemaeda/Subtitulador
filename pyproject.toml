@@ -1,0 +1,12 @@
+[project]
+name = "subtitulador"
+version = "1.0.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
