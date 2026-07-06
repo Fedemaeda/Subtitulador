@@ -3,6 +3,7 @@ faster-whisper
 flask
 deep-translator
 torch
+pywebview
 
 # Development dependencies
 pytest

@@ -377,8 +377,7 @@ def burn_subtitles(sid):
              "-c:a", "copy", str(output_path), "-y"],
             check=True, capture_output=True)
 
-        return send_file(str(output_path), as_attachment=True,
-                         download_name=f"subtitled.{ext}")
+        return jsonify({"file": str(output_path), "ext": ext, "name": f"subtitled.{ext}"})
 
     except subprocess.CalledProcessError as e:
         return jsonify({"error": f"FFmpeg: {e.stderr.decode('utf-8', errors='replace')[:500]}"}), 500

@@ -14,3 +14,14 @@ venv/
 *.webm
 
 .vercel
+
+# Test files
+test_*.py
+test_*.ps1
+test_tetris.py
+test_list_files.ps1
+
+# Installer/build output
+installer/
+dist/
+build/

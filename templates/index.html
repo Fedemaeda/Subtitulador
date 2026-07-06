@@ -832,10 +832,8 @@
             try {
                 const resp = await fetch('/api/session/' + sessionId + '/burn', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' });
                 if (!resp.ok) throw new Error((await resp.json()).error);
-                const blob = await resp.blob();
-                const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                a.download = 'subtitled.' + (selectedFile ? selectedFile.name.split('.').pop() : 'mp4');
-                a.click(); URL.revokeObjectURL(a.href);
+                const data = await resp.json();
+                pywebview.api.download(data.file, data.name);
             } catch(err) { alert(err.message); }
             btn.disabled = false; btn.textContent = 'Quemar';
         };
