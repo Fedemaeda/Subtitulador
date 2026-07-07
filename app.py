@@ -266,7 +266,7 @@ def transcribe():
         model = get_model(model_name)
         raw_segments, info = model.transcribe(
             audio_path, language=language,
-            word_timestamps=True, vad_filter=True)
+            word_timestamps=True)
 
         segments = [{"start": s.start, "end": s.end, "text": s.text} for s in raw_segments]
         detected_lang = info.language
